@@ -52,3 +52,13 @@ porAutorYTitulo
 invertir(porAnio)
 porPrestamosDesc
 ```
+
+## Laboratorio de rendimiento
+
+Ejecuta el comparativo de Bubble Sort, Selection Sort, Insertion Sort y `sort`:
+
+```bash
+node src/laboratorio.js
+```
+
+El laboratorio prueba arreglos de 500, 1.000, 2.000 y 4.000 libros en estados aleatorio, ordenado, invertido y casi ordenado. Para cada ejecución muestra comparaciones, intercambios, tiempo y una verificación automática; una salida incorrecta se identifica como `FALLA`.

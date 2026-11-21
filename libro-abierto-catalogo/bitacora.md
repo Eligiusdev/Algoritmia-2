@@ -346,3 +346,21 @@ Bubble Sort e Insertion Sort no intercambian elementos equivalentes para ese com
 Un algoritmo de ordenamiento es estable si dos elementos equivalentes según el comparador conservan el mismo orden relativo que tenían antes de ordenar.
 
 Ejemplo bibliotecario: al ordenar primero por título y luego por autor, los tres libros de Laura Restrepo deben conservar `Delirio`, `Dulce compañía` y `La novia oscura` en ese orden alfabético. Bubble Sort e Insertion Sort son adecuados para esa clasificación estable. Selection Sort no garantiza esa propiedad y puede revuelverlos. La estabilidad importa, por ejemplo, al hacer primero un informe por título y después agruparlo por autor sin perder el subtítulo alfabético.
+
+## Laboratorio de rendimiento v0.2
+
+`src/laboratorio.js` integra el generador, los comparadores y los tres algoritmos. Cada tamaño se prueba con datos aleatorios, ordenados, invertidos y casi ordenados. El laboratorio verifica los resultados recorriendo cada arreglo y muestra `FALLA` si encuentra dos elementos fuera de orden.
+
+### Recomendaciones para la red
+
+- **Reordenamiento nocturno de 10.000 libros:** usar `sort` del lenguaje o, si se exige un algoritmo didáctico, Insertion Sort solo sobre datos casi ordenados. Los algoritmos básicos tienen peor caso y crecimiento cuadrático; con 10.000 elementos pueden realizar decenas de millones de operaciones. `sort` ofrece el mejor margen operativo.
+- **Inserción diaria de libros nuevos:** mantener el catálogo casi ordenado y usar Insertion Sort. Al insertar pocas entradas al final, cada desplazamiento recorre una región corta y el costo permanece cercano a lineal en ese caso.
+- **Listas pequeñas de exhibición de 20 libros:** Insertion Sort o Bubble Sort son suficientes. Su baja constante, facilidad de implementación y ejecución inmediata son apropiadas para tamaños pequeños. Selection Sort puede usarse si se quiere minimizar intercambios, pero no aporta ventaja temporal frente a los demás.
+
+### Crecimiento al duplicar n
+
+Cuando el tamaño pasa de 500 a 1.000, de 1.000 a 2.000 y de 2.000 a 4.000, los tres algoritmos básicos muestran aproximadamente cuatro veces más comparaciones e intercambios en los estados desfavorables. Esta relación coincide con el cambio de `n` a `2n`: el costo cuadrático pasa de proporcional a `n²` a proporcional a `(2n)² = 4n²`.
+
+En las mediciones ejecutadas, el tiempo invertido de Bubble Sort pasó de aproximadamente 1.075 ms con 500 libros a 3.393 ms con 1.000, 14.321 ms con 2.000 y 78.208 ms con 4.000. Los factores no son uniformes por la carga temporal del equipo, pero la tendencia crece cerca de cuatro veces al duplicar `n`. Selection Sort creció aproximadamente de 1.082 ms a 2.751 ms, 9.793 ms y 48.476 ms en el mismo estado. Insertion Sort pasó de 0.889 ms a 3.663 ms, 12.151 ms y 57.521 ms.
+
+Por ejemplo, Selection Sort mantiene exactamente `n(n - 1)/2` comparaciones en los estados medidos. Bubble Sort e Insertion Sort pueden acercarse a esa cifra en datos invertidos o aleatorios. En cambio, `sort` usa implementaciones optimizadas del lenguaje y sus tiempos son órdenes menores para los tamaños de este laboratorio.
