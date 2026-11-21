@@ -64,3 +64,72 @@ Total: **4 comparaciones**. Se puede comprobar con:
 ```bash
 node -e "const muestra=require('./src/muestra'); const {buscarPorTitulo}=require('./src/busqueda'); console.log(buscarPorTitulo(muestra,'  DELIRIO  '));"
 ```
+
+## Búsqueda binaria por ISBN
+
+El catálogo se ordena una sola vez por ISBN mediante una copia:
+
+```js
+const ordenados = ordenarPorIsbn(libros);
+```
+
+`sort((a, b) => a.isbn.localeCompare(b.isbn))` no modifica el arreglo original porque `ordenarPorIsbn` comienza con `libros.slice()`. Las versiones iterativa y recursiva reciben este arreglo ordenado y cuentan una comparación por cada elemento medio revisado.
+
+### Traza de la muestra ordenada
+
+Primero se ordenó la muestra por ISBN. El arreglo queda así:
+
+| inicio | medio | fin | ISBN del medio |
+|---:|---:|---:|---|
+| 0 | 3 | 7 | 9789584295125 |
+| 4 | 5 | 7 | 9789587434477 |
+| 4 | 4 | 4 | 9789587047462 |
+
+La tabla anterior corresponde a la búsqueda de `9789587047462` (“Delirio”):
+
+1. Con `inicio = 0`, `fin = 7`, `medio = 3`; `9789587047462` es mayor que `9789584295125`, así que cambia a `inicio = 4`.
+2. Con `inicio = 4`, `fin = 7`, `medio = 5`; `9789587047462` es menor que `9789587434477`, así que cambia a `fin = 4`.
+3. Con `inicio = fin = 4`, `medio = 4`; coincide el ISBN y devuelve el libro.
+
+Total: **3 comparaciones**.
+
+Para buscar el ISBN inexistente `9789585000000`:
+
+| Paso | inicio | fin | medio | Comparación con el medio |
+|---:|---:|---:|---:|---|
+| 1 | 0 | 7 | 3 | `9789585000000` es mayor que `9789584295125` |
+| 2 | 4 | 7 | 5 | es menor que `9789587434477` |
+| 3 | 4 | 4 | 4 | es menor que `9789587047462` |
+
+Después del paso 3 queda `inicio = 4` y `fin = 3`; se termina y devuelve `null`. También fueron **3 comparaciones**.
+
+Se verifican ambas implementaciones con:
+
+```bash
+node -e "const m=require('./src/muestra'); const b=require('./src/busqueda'); const o=b.ordenarPorIsbn(m); for(const i of ['9789587047462','9789585000000']) console.log(i,b.buscarPorIsbn(o,i),b.buscarPorIsbnRecursivo(o,i));"
+```
+
+### Comparación lineal frente a binaria
+
+Los máximos teóricos de la búsqueda binaria se calculan con `Math.ceil(Math.log2(n + 1))`. Así, una búsqueda binaria sobre 1.000.000 de elementos necesita como máximo 20 comparaciones y nunca las supera.
+
+| Tamaño n | Lineal promedio | Lineal peor | Binaria máximo teórico |
+|---:|---:|---:|---:|
+| 1.000 | 500 | 1.000 | 10 |
+| 10.000 | 5.000 | 10.000 | 14 |
+| 1.000.000 | 500.000 | 1.000.000 | 20 |
+
+La lineal puede encontrar el primer elemento en una comparación, pero su peor caso crece proporcionalmente a `n`, por eso es O(n). La binaria divide el intervalo a la mitad en cada paso, por eso es O(log n). En el peor caso binario se mantiene muy por debajo de la lineal para los catálogos grandes.
+
+### Por qué el catálogo debe estar ordenado
+
+La muestra original no está ordenada por ISBN. Por ejemplo, si se busca `9789584264879` (“Rosario Tijeras”), la versión binaria compara primero el elemento del índice 3, `9789587047462`:
+
+1. `9789584264879 < 9789587047462`, por lo que descarta los índices `4` a `7`, incluidos varios elementos.
+2. En el subarreglo restante vuelve a descartar posiciones sin considerar que “Rosario Tijeras” está en el índice 4 del arreglo original.
+
+El resultado no es fiable y puede devolver `null` aunque el ISBN exista. Por eso también se demuestra con esta búsqueda sobre la muestra original:
+
+```bash
+node -e "const m=require('./src/muestra'); const b=require('./src/busqueda'); console.log(b.buscarPorIsbn(m,'9789584264879'));"
+```
