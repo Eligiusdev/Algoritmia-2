@@ -519,3 +519,35 @@ Quick Sort no es estable: particiona y puede cruzar elementos equivalentes para 
 | Uso recomendado | Garantía uniforme y estabilidad | Datos pequeños o práctica didáctica | Reordenamiento rápido con datos adversos |
 
 Quick Sort mediana de tres conserva un rendimiento cercano a O(n log n) y ordena en el lugar. Merge Sort ofrece garantías deterministas y estabilidad, a cambio de memoria adicional.
+
+## Ranking Top-K
+
+`topPrestados(libros, k)` usa `mergeSort` con `porPrestadosDesc` sobre una copia y toma los primeros `k`. La copia evita modificar el catálogo original. Su costo es O(n log n) para ordenar y O(k) para extraer.
+
+`topPrestadosSeleccion(libros, k)` conserva una copia y realiza `k` pasadas buscando el máximo desde la región restante. En cada pasada recorre a lo sumo `n - i` elementos, por lo que hace O(k·n) comparaciones y intercambia elementos en el lugar de su copia.
+
+Con 10.000 libros y mediciones deterministas:
+
+| k | Merge Sort completo | Selección parcial |
+|---:|---:|---:|
+| 10 | 8.885 ms | 6.136 ms |
+| 5.000 | 6.689 ms | 81.862 ms |
+
+Para `k = 10`, la selección parcial evita ordenar los 9.990 elementos restantes y es más conveniente. Para `k = 5000`, ordenar los datos completos tiene mejor costo relativo y es más apropiado. De forma general, selección parcial conviene cuando `k << n`; Merge Sort conviene cuando `k` es grande o se necesitan varios rankings reutilizables.
+
+## Autocompletar por prefijo
+
+Primero se usa `mergeSort` sobre una copia por título con comparación que ignora mayúsculas y tildes. `primeraPosicionPrefijo(titulosOrdenados, prefijo)` implementa límite inferior: encuentra el primer título cuyo texto normalizado es mayor o igual que el prefijo.
+
+`autocompletar(librosOrdenadosPorTitulo, prefijo, max)` comienza en esa posición y usa `startsWith` sobre cadenas normalizadas. Se detiene al salir del prefijo o al alcanzar `max`, por lo que no recorre el catálogo completo.
+
+Complejidad: O(log n) para hallar la primera posición y O(k) para devolver `k` coincidencias como máximo. En total, O(log n + k).
+
+Casos probados:
+
+| Prefijo | Comportamiento esperado |
+|---|---|
+| `"la ca"` | Devuelve los títulos que empiezan por esa cadena, como `La casa de las dos palmas` |
+| Prefijo de un resultado | Devuelve exactamente ese título y termina |
+| Prefijo inexistente | Devuelve `[]` |
+| Cadena vacía | Devuelve `[]` para evitar sugerencias sin escribir |

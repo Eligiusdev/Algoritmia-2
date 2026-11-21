@@ -81,6 +81,40 @@ function porPrestamosDesc(a, b) {
   return b.prestamos - a.prestamos;
 }
 
+function topPrestados(libros, k) {
+  if (!Number.isInteger(k) || k <= 0) return [];
+
+  const resultado = mergeSort(libros, porPrestamosDesc);
+  return resultado.arreglo.slice(0, k);
+}
+
+function topPrestadosSeleccion(libros, k) {
+  if (!Number.isInteger(k) || k <= 0) return [];
+
+  const copia = [...libros];
+  const cantidad = Math.min(k, copia.length);
+
+  for (let i = 0; i < cantidad; i += 1) {
+    let indiceMaximo = i;
+
+    for (let j = i + 1; j < copia.length; j += 1) {
+      if (porPrestamosDesc(copia[j], copia[indiceMaximo]) < 0) {
+        indiceMaximo = j;
+      }
+    }
+
+    if (indiceMaximo !== i) {
+      [copia[i], copia[indiceMaximo]] = [copia[indiceMaximo], copia[i]];
+    }
+  }
+
+  return copia.slice(0, cantidad);
+}
+
+function ordenarPorTitulo(libros) {
+  return mergeSort(libros, porTitulo).arreglo;
+}
+
 function invertir(comparar) {
   return (a, b) => comparar(b, a);
 }
@@ -310,6 +344,9 @@ module.exports = {
   porAutor,
   porAutorYTitulo,
   porPrestamosDesc,
+  topPrestados,
+  topPrestadosSeleccion,
+  ordenarPorTitulo,
   invertir,
   selectionSort,
   insertionSort,

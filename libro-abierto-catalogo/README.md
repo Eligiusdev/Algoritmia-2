@@ -65,3 +65,15 @@ node src/laboratorio.js
 ```
 
 El laboratorio prueba arreglos de 500, 1.000, 2.000 y 4.000 libros en estados aleatorio, ordenado, invertido y casi ordenado. Para cada ejecución muestra comparaciones, intercambios, tiempo y una verificación automática; una salida incorrecta se identifica como `FALLA`. También compara Quick Sort con pivote fijo y con mediana de tres.
+
+## Top-K y autocompletar
+
+```js
+topPrestados(libros, 10)
+topPrestadosSeleccion(libros, 10)
+ordenarPorTitulo(libros)
+primeraPosicionPrefijo(titulosOrdenados, "la ca")
+autocompletar(librosOrdenadosPorTitulo, "la ca", 10)
+```
+
+Top-K puede usar Merge Sort completo o selección parcial. El autocompletar normaliza mayúsculas y tildes y usa una búsqueda binaria de límite inferior seguida de recorrido solo por el rango del prefijo.

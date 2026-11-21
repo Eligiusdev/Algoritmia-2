@@ -1,6 +1,10 @@
 function normalizarTexto(texto) {
   if (typeof texto !== "string") return "";
-  return texto.trim().toLowerCase();
+  return texto
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 function buscarPorTitulo(libros, titulo) {
@@ -160,6 +164,58 @@ function primeraPosicionIsbn(librosOrdenados, isbn, contador) {
   return primera;
 }
 
+function primeraPosicionPrefijo(titulosOrdenados, prefijo) {
+  const prefijoNormalizado = normalizarTexto(prefijo);
+  if (prefijoNormalizado === "") return 0;
+
+  let inicio = 0;
+  let fin = titulosOrdenados.length - 1;
+  let primera = titulosOrdenados.length;
+
+  while (inicio <= fin) {
+    const medio = Math.floor((inicio + fin) / 2);
+    const item = titulosOrdenados[medio];
+    const titulo = typeof item === "string" ? item : item.titulo;
+    const tituloNormalizado = normalizarTexto(titulo);
+
+    if (
+      tituloNormalizado.localeCompare(prefijoNormalizado, "es", {
+        sensitivity: "base"
+      }) >= 0
+    ) {
+      primera = medio;
+      fin = medio - 1;
+    } else {
+      inicio = medio + 1;
+    }
+  }
+
+  return primera;
+}
+
+function autocompletar(librosOrdenadosPorTitulo, prefijo, max) {
+  if (!Number.isInteger(max) || max <= 0) return [];
+
+  const prefijoNormalizado = normalizarTexto(prefijo);
+  if (prefijoNormalizado === "") return [];
+
+  const primera = primeraPosicionPrefijo(librosOrdenadosPorTitulo, prefijoNormalizado);
+  const resultados = [];
+
+  for (
+    let i = primera;
+    i < librosOrdenadosPorTitulo.length && resultados.length < max;
+    i += 1
+  ) {
+    const titulo = normalizarTexto(librosOrdenadosPorTitulo[i].titulo);
+
+    if (!titulo.startsWith(prefijoNormalizado)) break;
+    resultados.push(librosOrdenadosPorTitulo[i]);
+  }
+
+  return resultados;
+}
+
 module.exports = {
   normalizarTexto,
   buscarPorTitulo,
@@ -168,5 +224,7 @@ module.exports = {
   ordenarPorIsbn,
   buscarPorIsbn,
   buscarPorIsbnRecursivo,
-  primeraPosicionIsbn
+  primeraPosicionIsbn,
+  primeraPosicionPrefijo,
+  autocompletar
 };
