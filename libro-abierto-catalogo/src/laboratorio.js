@@ -4,6 +4,8 @@ const {
   selectionSort,
   insertionSort,
   mergeSort,
+  quickSort,
+  quickSortMedianaTres,
   porAnio
 } = require("./ordenamiento");
 
@@ -92,6 +94,8 @@ for (const n of tamanios) {
     const selection = medir(selectionSort, libros);
     const insertion = medir(insertionSort, libros);
     const merge = medir(mergeSort, libros);
+    const quick = medir(quickSort, libros);
+    const quickMediana = medir(quickSortMedianaTres, libros);
     const sortNativo = medirSort(libros);
 
     filas.push({
@@ -138,6 +142,24 @@ for (const n of tamanios) {
       Intercambios: sortNativo.intercambios,
       "Tiempo (ms)": sortNativo.tiempoMs.toFixed(3),
       Verificacion: sortNativo.estado
+    });
+    filas.push({
+      Estado: estadoDatos,
+      n,
+      Algoritmo: "Quick Sort pivote final",
+      Comparaciones: quick.comparaciones,
+      Intercambios: quick.intercambios,
+      "Tiempo (ms)": quick.tiempoMs.toFixed(3),
+      Verificacion: quick.estado
+    });
+    filas.push({
+      Estado: estadoDatos,
+      n,
+      Algoritmo: "Quick Sort mediana de tres",
+      Comparaciones: quickMediana.comparaciones,
+      Intercambios: quickMediana.intercambios,
+      "Tiempo (ms)": quickMediana.tiempoMs.toFixed(3),
+      Verificacion: quickMediana.estado
     });
   }
 

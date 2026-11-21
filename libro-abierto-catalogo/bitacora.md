@@ -446,3 +446,76 @@ En una medición aleatoria con 4.000 libros, Merge Sort utilizó 42.913 comparac
 | Merge Sort | 8,798 ms |
 
 La medición de tiempo depende de la máquina y de la ejecución; el costo contable es estable: O(n log n) frente al crecimiento cuadrático de los tres algoritmos básicos.
+
+## Quick Sort
+
+`particion(arreglo, inicio, fin, comparar)` implementa el esquema de Lomuto tomando el último elemento como pivote. Devuelve el índice final del pivote. `quickSort(arreglo, comparar)` trabaja sobre una copia y divide recursivamente. `quickSortMedianaTres` reemplaza el último pivote por la mediana del primero, el centro y el último antes de particionar.
+
+### Primera partición con Lomuto
+
+Años iniciales:
+
+```text
+[2006, 1967, 2004, 1924, 1999, 2007, 1988, 2002]
+Pivote = 2002
+```
+
+La partición recorre `j = 0` a `j = 6`:
+
+1. `2006 > 2002`: no intercambia.
+2. `1967 <= 2002`: coloca `1967` al inicio.
+3. `2004 <= 2002`: coloca `2004` en la región menor.
+4. `1924 <= 2002`: coloca `1924` en la región menor.
+5. `1999 <= 2002`: coloca `1999` en la región menor.
+6. `2007 > 2002`: no intercambia.
+7. `1988 <= 2002`: coloca `1988` en la región menor.
+8. Intercambia el pivote `2002` por el siguiente elemento mayor.
+
+Resultado de la primera partición:
+
+```text
+[1967, 1924, 1999, 1988, 2002, 2007, 2006, 2004]
+Índice del pivote: 4
+Comparaciones: 7
+Intercambios: 6
+```
+
+### Peor caso con datos ordenados
+
+Con el último elemento como pivote y datos ya ordenados, cada partición deja casi todos los elementos en el lado izquierdo y ninguno o muy pocos en el derecho. El arreglo se descompone como `n + (n - 1) + (n - 2) + ... + 1`, por eso Quick Sort hace aproximadamente `n(n - 1)/2` comparaciones y alcanza O(n²).
+
+| Estado, n = 10.000 | Versión | Comparaciones | Intercambios | Tiempo |
+|---|---|---:|---:|---:|
+| Aleatorio | Pivote final | 151.741 | 63.155 | 14,932 ms |
+| Aleatorio | Mediana de tres | 159.005 | 69.192 | 6,826 ms |
+| Ordenado | Pivote final | 49.995.000 | 0 | 178,895 ms |
+| Ordenado | Mediana de tres | 131.343 | 11.808 | 2,702 ms |
+
+La mediana de tres corrige el arreglo ordenado porque el valor central evita que el pivote sea siempre el mayor.
+
+### Estabilidad
+
+Se repitió el experimento de dos pasos sobre autor y título. Las dos versiones de Quick Sort devolvieron títulos de Mario Mendoza invertidos o fuera del orden alfabético:
+
+```text
+Laura Restrepo/Delirio
+Laura Restrepo/Dulce compañía
+Laura Restrepo/La novia oscura
+Mario Mendoza/Cobro de sangre
+Mario Mendoza/Buda Blues
+```
+
+Quick Sort no es estable: particiona y puede cruzar elementos equivalentes para el segundo comparador, cambiando su orden relativo. Merge Sort sí conserva esos elementos.
+
+### Merge Sort frente a Quick Sort
+
+| Aspecto | Merge Sort | Quick Sort pivote fijo | Quick Sort mediana/aleatorio |
+|---|---|---|---|
+| Mejor caso | O(n log n) | O(n log n) con particiones balanceadas | O(n log n) |
+| Caso promedio | O(n log n) | O(n log n) | O(n log n) |
+| Peor caso | O(n log n) | O(n²) con datos adversos u ordenados | O(n log n) esperado o probabilístico |
+| Memoria adicional | O(n) | O(log n) en pila esperada | O(log n) en pila esperada |
+| Estabilidad | Estable | Inestable | Inestable |
+| Uso recomendado | Garantía uniforme y estabilidad | Datos pequeños o práctica didáctica | Reordenamiento rápido con datos adversos |
+
+Quick Sort mediana de tres conserva un rendimiento cercano a O(n log n) y ordena en el lugar. Merge Sort ofrece garantías deterministas y estabilidad, a cambio de memoria adicional.

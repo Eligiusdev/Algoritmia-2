@@ -198,6 +198,110 @@ function mergeSort(arreglo, comparar) {
   };
 }
 
+function particion(arreglo, inicio, fin, comparar, contador) {
+  const pivote = arreglo[fin];
+  let i = inicio - 1;
+
+  for (let j = inicio; j < fin; j += 1) {
+    if (contador) contador.comparaciones += 1;
+
+    if (comparar(arreglo[j], pivote) <= 0) {
+      i += 1;
+      if (i !== j) {
+        [arreglo[i], arreglo[j]] = [arreglo[j], arreglo[i]];
+        if (contador) contador.intercambios += 1;
+      }
+    }
+  }
+
+  if (i + 1 !== fin) {
+    [arreglo[i + 1], arreglo[fin]] = [arreglo[fin], arreglo[i + 1]];
+    if (contador) contador.intercambios += 1;
+  }
+
+  return i + 1;
+}
+
+function quickSort(arreglo, comparar) {
+  const copia = [...arreglo];
+  const contador = { comparaciones: 0, intercambios: 0 };
+
+  function ordenar(inicio, fin) {
+    while (inicio < fin) {
+      const pivote = particion(copia, inicio, fin, comparar, contador);
+
+      if (pivote - inicio < fin - pivote) {
+        ordenar(inicio, pivote - 1);
+        inicio = pivote + 1;
+      } else {
+        ordenar(pivote + 1, fin);
+        fin = pivote - 1;
+      }
+    }
+  }
+
+  ordenar(0, copia.length - 1);
+
+  return {
+    arreglo: copia,
+    comparaciones: contador.comparaciones,
+    intercambios: contador.intercambios
+  };
+}
+
+function medianaDeTres(arreglo, inicio, fin, comparar, contador) {
+  const medio = Math.floor((inicio + fin) / 2);
+  const valores = [inicio, medio, fin];
+
+  if (contador) contador.comparaciones += 1;
+  if (comparar(arreglo[valores[0]], arreglo[valores[1]]) > 0) {
+    [valores[0], valores[1]] = [valores[1], valores[0]];
+  }
+  if (contador) contador.comparaciones += 1;
+  if (comparar(arreglo[valores[1]], arreglo[valores[2]]) > 0) {
+    [valores[1], valores[2]] = [valores[2], valores[1]];
+  }
+  if (contador) contador.comparaciones += 1;
+  if (comparar(arreglo[valores[0]], arreglo[valores[1]]) > 0) {
+    [valores[0], valores[1]] = [valores[1], valores[0]];
+  }
+
+  return valores[1];
+}
+
+function quickSortMedianaTres(arreglo, comparar) {
+  const copia = [...arreglo];
+  const contador = { comparaciones: 0, intercambios: 0 };
+
+  function ordenar(inicio, fin) {
+    while (inicio < fin) {
+      const indiceMediana = medianaDeTres(copia, inicio, fin, comparar, contador);
+      if (indiceMediana !== fin) {
+        [copia[indiceMediana], copia[fin]] = [copia[fin], copia[indiceMediana]];
+        contador.intercambios += 1;
+      }
+
+      const pivote = particion(copia, inicio, fin, comparar, contador);
+
+      if (pivote - inicio < fin - pivote) {
+        ordenar(inicio, pivote - 1);
+        inicio = pivote + 1;
+      } else {
+        ordenar(pivote + 1, fin);
+        fin = pivote - 1;
+      }
+    }
+  }
+
+  ordenar(0, copia.length - 1);
+
+  return {
+    arreglo: copia,
+    comparaciones: contador.comparaciones,
+    intercambios: contador.intercambios
+  };
+}
+
 module.exports = {
   bubbleSort,
   bubbleSortOriginal,
@@ -210,5 +314,8 @@ module.exports = {
   selectionSort,
   insertionSort,
   mezclar,
-  mergeSort
+  mergeSort,
+  particion,
+  quickSort,
+  quickSortMedianaTres
 };
