@@ -44,3 +44,11 @@ El módulo `ordenamiento.js` incluye Bubble Sort optimizado, Selection Sort e In
 selectionSort(arreglo, porAnio)
 insertionSort(arreglo, porAnio)
 ```
+
+Los comparadores compuestos pueden combinar varios campos:
+
+```js
+porAutorYTitulo
+invertir(porAnio)
+porPrestamosDesc
+```

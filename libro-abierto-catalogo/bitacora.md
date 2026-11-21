@@ -275,3 +275,74 @@ La traza tiene 9 comparaciones y 7 desplazamientos contados como intercambios.
 **¿Cuál hace siempre la misma cantidad de comparaciones?** Selection Sort hace siempre `n(n - 1) / 2` comparaciones en esta versión, aproximadamente 1.999.000 para `n = 2.000`, sin importar si está ordenado, invertido o casi ordenado. Bubble Sort optimizado e Insertion Sort sí reducen trabajo según el estado inicial.
 
 Aunque las mediciones cambien mucho, los tres tienen peor caso O(n²): Bubble Sort e Insertion Sort pueden hacer aproximadamente `n²/2` comparaciones y desplazamientos en un arreglo invertido; Selection Sort hace `n(n - 1)/2` comparaciones en cualquier arreglo y hasta O(n) intercambios. El peor crecimiento sigue siendo cuadrático, aunque Selection Sort tenga menos intercambios y Insertion Sort aproveche estados casi ordenados.
+
+## Comparadores compuestos y estabilidad
+
+`porAutorYTitulo(a, b)` compara primero el autor con `localeCompare(..., "es", { sensitivity: "base" })`. Si ambos autores son equivalentes, usa el título con las mismas opciones. Así ignora mayúsculas y diferencias de tildes para bibliotecarios y lectores.
+
+`porPrestamosDesc(a, b)` devuelve `b.prestamos - a.prestamos`, por lo que coloca primero los libros con más préstamos. `invertir(comparar)` recibe un comparador y devuelve otro que invierte sus signos; por ejemplo, `invertir(porAnio)` ordena del año más reciente al más antiguo.
+
+### Tabla utilizada
+
+| Autor | Título | Año |
+|---|---|---:|
+| Laura Restrepo | Delirio | 2004 |
+| Mario Mendoza | Cobro de sangre | 2004 |
+| Laura Restrepo | Dulce compañía | 1995 |
+| Mario Mendoza | Buda Blues | 2009 |
+| Laura Restrepo | La novia oscura | 1999 |
+
+Ordenada directamente con `porAutorYTitulo`, esta tabla queda:
+
+```text
+[Laura Restrepo/Delirio,
+ Laura Restrepo/Dulce compañía,
+ Laura Restrepo/La novia oscura,
+ Mario Mendoza/Buda Blues,
+ Mario Mendoza/Cobro de sangre]
+```
+
+Los tres algoritmos producen este mismo arreglo con el comparador compuesto.
+
+### Experimento del bibliotecario
+
+Primero se ordena por título con `porTitulo`; después se ordena el resultado solo por autor. Ambos pasos utilizan el mismo algoritmo.
+
+| Algoritmo | Resultado por autor y título conservado |
+|---|---|
+| Bubble Sort | Sí; mantiene el orden alfabético del título dentro de cada autor |
+| Insertion Sort | Sí; mantiene el orden alfabético del título dentro de cada autor |
+| Selection Sort | No; mezcla el orden de títulos dentro de cada autor |
+
+La prueba produjo para Selection Sort:
+
+```text
+Laura Restrepo/Delirio
+Laura Restrepo/Dulce compañía
+Laura Restrepo/La novia oscura
+Mario Mendoza/Cobro de sangre
+Mario Mendoza/Buda Blues
+```
+
+Los títulos de Mario Mendoza quedaron en `[Cobro de sangre, Buda Blues]`, contrario al orden alfabético obtenido por el primer paso. Esto identifica la inestabilidad del conjunto completo.
+
+Ejemplo de traza de Selection Sort después del primer orden por título:
+
+```text
+Inicial por título:
+[Buda Blues (Mario),
+ Cobro de sangre (Mario),
+ Delirio (Laura),
+ Dulce compañía (Laura),
+ La novia oscura (Laura)]
+```
+
+Al ordenar solo por autor, Selection Sort busca repetidamente el mínimo autor entre los sufijos. Intercambia elementos de los extremos y puede separar o intercambiar dos elementos equivalentes para el comparador nuevo. Por ello, dentro de `Laura Restrepo` ya no aparecen necesariamente en el orden alfabético obtenido antes.
+
+Bubble Sort e Insertion Sort no intercambian elementos equivalentes para ese comparador: Bubble Sort solo cambia pares cuando `comparar(a, b) > 0`, e Insertion Sort usa `<= 0` para detener el desplazamiento. Consecuentemente conservan el orden relativo de los elementos con el mismo autor.
+
+### Definición de estabilidad
+
+Un algoritmo de ordenamiento es estable si dos elementos equivalentes según el comparador conservan el mismo orden relativo que tenían antes de ordenar.
+
+Ejemplo bibliotecario: al ordenar primero por título y luego por autor, los tres libros de Laura Restrepo deben conservar `Delirio`, `Dulce compañía` y `La novia oscura` en ese orden alfabético. Bubble Sort e Insertion Sort son adecuados para esa clasificación estable. Selection Sort no garantiza esa propiedad y puede revuelverlos. La estabilidad importa, por ejemplo, al hacer primero un informe por título y después agruparlo por autor sin perder el subtítulo alfabético.

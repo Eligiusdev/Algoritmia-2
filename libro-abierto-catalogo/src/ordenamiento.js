@@ -53,6 +53,38 @@ function porAnio(a, b) {
   return a.año - b.año;
 }
 
+function porTitulo(a, b) {
+  return a.titulo.localeCompare(b.titulo, "es", {
+    sensitivity: "base"
+  });
+}
+
+function porAutor(a, b) {
+  return a.autor.localeCompare(b.autor, "es", {
+    sensitivity: "base"
+  });
+}
+
+function porAutorYTitulo(a, b) {
+  const porAutor = a.autor.localeCompare(b.autor, "es", {
+    sensitivity: "base"
+  });
+
+  if (porAutor !== 0) return porAutor;
+
+  return a.titulo.localeCompare(b.titulo, "es", {
+    sensitivity: "base"
+  });
+}
+
+function porPrestamosDesc(a, b) {
+  return b.prestamos - a.prestamos;
+}
+
+function invertir(comparar) {
+  return (a, b) => comparar(b, a);
+}
+
 function selectionSort(arreglo, comparar) {
   const copia = [...arreglo];
   let comparaciones = 0;
@@ -114,6 +146,11 @@ module.exports = {
   bubbleSort,
   bubbleSortOriginal,
   porAnio,
+  porTitulo,
+  porAutor,
+  porAutorYTitulo,
+  porPrestamosDesc,
+  invertir,
   selectionSort,
   insertionSort
 };
