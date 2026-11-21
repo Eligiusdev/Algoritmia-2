@@ -38,11 +38,12 @@ node -e "const m=require('./src/muestra'); const {bubbleSort,porAnio}=require('.
 
 ## Algoritmos de ordenamiento
 
-El módulo `ordenamiento.js` incluye Bubble Sort optimizado, Selection Sort e Insertion Sort. Todos reciben una función `comparar` y devuelven una copia ordenada con sus contadores:
+El módulo `ordenamiento.js` incluye Bubble Sort optimizado, Selection Sort, Insertion Sort y Merge Sort. Todos reciben una función `comparar` y devuelven una copia ordenada con sus contadores:
 
 ```js
 selectionSort(arreglo, porAnio)
 insertionSort(arreglo, porAnio)
+mergeSort(arreglo, porAnio)
 ```
 
 Los comparadores compuestos pueden combinar varios campos:
@@ -55,7 +56,7 @@ porPrestamosDesc
 
 ## Laboratorio de rendimiento
 
-Ejecuta el comparativo de Bubble Sort, Selection Sort, Insertion Sort y `sort`:
+Ejecuta el comparativo de Bubble Sort, Selection Sort, Insertion Sort, Merge Sort y `sort`:
 
 ```bash
 node src/laboratorio.js

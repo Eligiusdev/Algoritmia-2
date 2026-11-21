@@ -3,6 +3,7 @@ const {
   bubbleSort,
   selectionSort,
   insertionSort,
+  mergeSort,
   porAnio
 } = require("./ordenamiento");
 
@@ -90,6 +91,7 @@ for (const n of tamanios) {
     const bubble = medir(bubbleSort, libros);
     const selection = medir(selectionSort, libros);
     const insertion = medir(insertionSort, libros);
+    const merge = medir(mergeSort, libros);
     const sortNativo = medirSort(libros);
 
     filas.push({
@@ -118,6 +120,15 @@ for (const n of tamanios) {
       Intercambios: insertion.intercambios,
       "Tiempo (ms)": insertion.tiempoMs.toFixed(3),
       Verificacion: insertion.estado
+    });
+    filas.push({
+      Estado: estadoDatos,
+      n,
+      Algoritmo: "Merge Sort",
+      Comparaciones: merge.comparaciones,
+      Intercambios: merge.intercambios,
+      "Tiempo (ms)": merge.tiempoMs.toFixed(3),
+      Verificacion: merge.estado
     });
     filas.push({
       Estado: estadoDatos,

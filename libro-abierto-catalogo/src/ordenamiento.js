@@ -142,6 +142,62 @@ function insertionSort(arreglo, comparar) {
   };
 }
 
+function mezclar(izquierda, derecha, comparar) {
+  const resultado = [];
+  let i = 0;
+  let j = 0;
+  let comparaciones = 0;
+
+  while (i < izquierda.length && j < derecha.length) {
+    comparaciones += 1;
+
+    if (comparar(izquierda[i], derecha[j]) <= 0) {
+      resultado.push(izquierda[i]);
+      i += 1;
+    } else {
+      resultado.push(derecha[j]);
+      j += 1;
+    }
+  }
+
+  while (i < izquierda.length) {
+    resultado.push(izquierda[i]);
+    i += 1;
+  }
+
+  while (j < derecha.length) {
+    resultado.push(derecha[j]);
+    j += 1;
+  }
+
+  return {
+    arreglo: resultado,
+    comparaciones
+  };
+}
+
+function mergeSort(arreglo, comparar) {
+  let comparaciones = 0;
+
+  function dividir(elementos) {
+    if (elementos.length <= 1) return [...elementos];
+
+    const medio = Math.floor(elementos.length / 2);
+    const izquierda = dividir(elementos.slice(0, medio));
+    const derecha = dividir(elementos.slice(medio));
+    const mezcla = mezclar(izquierda, derecha, comparar);
+    comparaciones += mezcla.comparaciones;
+
+    return mezcla.arreglo;
+  }
+
+  return {
+    arreglo: dividir(arreglo),
+    comparaciones,
+    intercambios: 0
+  };
+}
+
 module.exports = {
   bubbleSort,
   bubbleSortOriginal,
@@ -152,5 +208,7 @@ module.exports = {
   porPrestamosDesc,
   invertir,
   selectionSort,
-  insertionSort
+  insertionSort,
+  mezclar,
+  mergeSort
 };

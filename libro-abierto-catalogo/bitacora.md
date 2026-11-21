@@ -364,3 +364,85 @@ Cuando el tamaño pasa de 500 a 1.000, de 1.000 a 2.000 y de 2.000 a 4.000, los 
 En las mediciones ejecutadas, el tiempo invertido de Bubble Sort pasó de aproximadamente 1.075 ms con 500 libros a 3.393 ms con 1.000, 14.321 ms con 2.000 y 78.208 ms con 4.000. Los factores no son uniformes por la carga temporal del equipo, pero la tendencia crece cerca de cuatro veces al duplicar `n`. Selection Sort creció aproximadamente de 1.082 ms a 2.751 ms, 9.793 ms y 48.476 ms en el mismo estado. Insertion Sort pasó de 0.889 ms a 3.663 ms, 12.151 ms y 57.521 ms.
 
 Por ejemplo, Selection Sort mantiene exactamente `n(n - 1)/2` comparaciones en los estados medidos. Bubble Sort e Insertion Sort pueden acercarse a esa cifra en datos invertidos o aleatorios. En cambio, `sort` usa implementaciones optimizadas del lenguaje y sus tiempos son órdenes menores para los tamaños de este laboratorio.
+
+## Merge Sort
+
+`mezclar(izquierda, derecha, comparar)` combina dos arreglos ya ordenados. Conserva el elemento izquierdo antes del derecho cuando el comparador devuelve 0 o negativo. Por eso no invierte elementos equivalentes y la operación es estable. Devuelve `{ arreglo, comparaciones }`.
+
+`mergeSort(arreglo, comparar)` recibe una copia implícita a través de las divisiones con `slice`, aplica el caso base para arreglos de cero o un elemento y divide hasta formar hojas.
+
+```js
+const izquierda = mergeSort([1924, 1967], porAnio).arreglo;
+const derecha = mergeSort([2006, 2004], porAnio).arreglo;
+mezclar(izquierda, derecha, porAnio);
+```
+
+### Árbol de divisiones y mezclas
+
+Años iniciales: `[2006, 1967, 2004, 1924, 1999, 2007, 1988, 2002]`
+
+```text
+Divisiones:
+[2006,1967,2004,1924,1999,2007,1988,2002]
+├─ [2006,1967,2004,1924]
+│  ├─ [2006,1967]
+│  │  ├─ [2006]
+│  │  └─ [1967]
+│  └─ [2004,1924]
+│     ├─ [2004]
+│     └─ [1924]
+└─ [1999,2007,1988,2002]
+   ├─ [1999,2007]
+   │  ├─ [1999]
+   │  └─ [2007]
+   └─ [1988,2002]
+      ├─ [1988]
+      └─ [2002]
+
+Mezclas:
+[2006],[1967] -> [1967,2006]
+[2004],[1924] -> [1924,2004]
+[1967,2006],[1924,2004] -> [1924,1967,2004,2006]
+[1999],[2007] -> [1999,2007]
+[1988],[2002] -> [1988,2002]
+[1999,2007],[1988,2002] -> [1988,1999,2002,2007]
+[1924,1967,2004,2006],[1988,1999,2002,2007]
+-> [1924,1967,1988,1999,2002,2004,2006,2007]
+```
+
+### Comparaciones medibles
+
+| Tamaño n | Comparaciones Merge Sort | n · log₂(n) | Resultado |
+|---:|---:|---:|---|
+| 1.000 | 8.720 | 9.965,78 | Por debajo |
+| 10.000 | 120.476 | 132.877,12 | Por debajo |
+| 100.000 | 1.536.754 | 1.660.964,05 | Por debajo |
+
+Las mediciones se hicieron con arreglos aleatorios deterministas. Para los tres tamaños las comparaciones están por debajo de `n * log2(n)`. Merge Sort tiene complejidad temporal O(n log n) en el mejor y el peor caso, y memoria adicional O(n) por las copias y arreglos de mezcla.
+
+### Estabilidad de Merge Sort
+
+Se repitió el experimento del MiniReto 7: ordenar primero por título y después por autor. Merge Sort conservó:
+
+```text
+Laura Restrepo/Delirio
+Laura Restrepo/Dulce compañía
+Laura Restrepo/La novia oscura
+Mario Mendoza/Buda Blues
+Mario Mendoza/Cobro de sangre
+```
+
+Es estable porque, al mezclar dos libros equivalentes para el comparador, siempre toma primero el elemento de la mitad izquierda. Las divisiones preservan el orden relativo entre ocurrencias equivalentes.
+
+### Laboratorio con 4.000 libros
+
+En una medición aleatoria con 4.000 libros, Merge Sort utilizó 42.913 comparaciones y estuvo por debajo de los tres algoritmos básicos:
+
+| Algoritmo | Tiempo aproximado |
+|---|---:|
+| Bubble Sort | 106,500 ms |
+| Selection Sort | 39,169 ms |
+| Insertion Sort | 28,979 ms |
+| Merge Sort | 8,798 ms |
+
+La medición de tiempo depende de la máquina y de la ejecución; el costo contable es estable: O(n log n) frente al crecimiento cuadrático de los tres algoritmos básicos.
