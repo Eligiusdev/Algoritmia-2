@@ -151,3 +151,58 @@ El título, el autor y la palabra no tienen índice ni arreglo ordenado en esta 
 El generador acepta `{ copiasRepetidas: c }`. Al generar `n` libros, reemplaza hasta `c` posiciones finales por ISBN ya existentes. Así mantiene el tamaño solicitado y permite probar copias de sedes sin modificar el comportamiento predeterminado.
 
 `src/catalogo.js` genera 10.000 libros y una copia ordenada con `sort`. Después muestra consultas por título, autor, palabra e ISBN, ambas formas binarias y la búsqueda de todas las copias. Para ISBN repetidos, `primeraPosicionIsbn` conserva el extremo izquierdo donde coincide y cuenta las copias recorriendo desde esa posición hacia la derecha hasta que cambia el ISBN.
+
+## Bubble Sort por año
+
+`bubbleSort(arreglo, comparar)` crea una copia mediante `[...arreglo]`, recorre pares adyacentes y usa desestructuración para intercambiar los elementos cuando `comparar(a, b) > 0`. Devuelve `{ arreglo, comparaciones, intercambios }`.
+
+`porAnio(a, b)` devuelve `a.año - b.año`, de modo que Bubble Sort presenta los libros desde el año más antiguo hasta el más reciente. La muestra queda ordenada desde 1924 hasta 2007.
+
+La versión optimizada registra si hubo intercambios en una pasada. Si no hubo ninguno, termina antes porque el arreglo ya está ordenado.
+
+### Traza de las dos primeras pasadas
+
+Años iniciales:
+
+```text
+[1967, 1924, 2006, 2004, 1999, 2007, 1988, 2002]
+```
+
+**Primera pasada:** se comparan los pares adyacentes hasta llevar el mayor elemento al final.
+
+```text
+Antes: [1967, 1924, 2006, 2004, 1999, 2007, 1988, 2002]
+j=0:   [1924, 1967, 2006, 2004, 1999, 2007, 1988, 2002]
+j=2:   [1924, 1967, 2004, 2006, 1999, 2007, 1988, 2002]
+j=3:   [1924, 1967, 2004, 1999, 2006, 2007, 1988, 2002]
+j=5:   [1924, 1967, 2004, 1999, 2006, 1988, 2007, 2002]
+j=6:   [1924, 1967, 2004, 1999, 2006, 1988, 2002, 2007]
+```
+
+Realiza 7 comparaciones y 5 intercambios.
+
+**Segunda pasada:** como `2007` ya está al final, se revisan las posiciones 0 a 6.
+
+```text
+Antes: [1924, 1967, 2004, 1999, 2006, 1988, 2002, 2007]
+j=2:   [1924, 1967, 1999, 2004, 2006, 1988, 2002, 2007]
+j=4:   [1924, 1967, 1999, 2004, 1988, 2006, 2002, 2007]
+j=5:   [1924, 1967, 1999, 2004, 1988, 2002, 2006, 2007]
+```
+
+Realiza 6 comparaciones y 3 intercambios.
+
+### Mediciones con 1.000 libros
+
+Se midieron tres arreglos con objetos que tienen `año`: aleatorio determinista generado con el generador lineal congruencial `seed = (1103515245 * seed + 12345) mod 2147483648`, ya ordenado y invertido. `bubbleSortOriginal` conserva el recorrido completo de todas las pasadas; `bubbleSort` termina cuando una pasada no produce intercambios.
+
+| Estado | Versión | Comparaciones | Intercambios |
+|---|---|---:|---:|
+| Aleatorio | Original | 499.500 | 257.416 |
+| Aleatorio | Optimizada | 498.465 | 257.416 |
+| Ya ordenado | Original | 499.500 | 0 |
+| Ya ordenado | Optimizada | 999 | 0 |
+| Invertido | Original | 499.500 | 499.500 |
+| Invertido | Optimizada | 499.500 | 499.500 |
+
+El mejor caso de la versión optimizada es un arreglo ya ordenado: hace `n - 1 = 999` comparaciones y ningún intercambio, por lo que es O(n). El peor caso, como el arreglo invertido, conserva ambos componentes como sumas cuadráticas: comparaciones e intercambios son O(n²). Bubble Sort completo siempre mantiene una complejidad temporal O(n²) incluso si el arreglo está ordenado, por eso la optimización solo mejora el mejor caso.

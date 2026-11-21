@@ -24,5 +24,14 @@ node src/explorar.js
 - Por ISBN: búsqueda binaria iterativa.
 - Por ISBN en forma recursiva: búsqueda binaria recursiva.
 - Primera posición y todas las copias de un ISBN: búsqueda binaria de primera ocurrencia más recorrido hacia la derecha.
+- Catálogo por año: Bubble Sort de más antiguo a más reciente, con salida temprana.
 
 El reporte integrado genera 10.000 libros, prepara una copia ordenada por ISBN y muestra el algoritmo, el resultado y las comparaciones de cada consulta. La opción `copiasRepetidas` del generador permite insertar ISBN repetidos para probar copias de distintas sedes.
+
+## Ordenamiento por año
+
+La muestra puede ordenarse sin modificar el arreglo original:
+
+```bash
+node -e "const m=require('./src/muestra'); const {bubbleSort,porAnio}=require('./src/ordenamiento'); console.log(bubbleSort(m,porAnio));"
+```
