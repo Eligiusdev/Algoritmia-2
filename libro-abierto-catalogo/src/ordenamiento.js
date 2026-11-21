@@ -53,6 +53,13 @@ function porAnio(a, b) {
   return a.año - b.año;
 }
 
+function porIsbn(a, b) {
+  return a.isbn.localeCompare(b.isbn, "es", {
+    numeric: true,
+    sensitivity: "base"
+  });
+}
+
 function porTitulo(a, b) {
   return a.titulo.localeCompare(b.titulo, "es", {
     sensitivity: "base"
@@ -340,6 +347,7 @@ module.exports = {
   bubbleSort,
   bubbleSortOriginal,
   porAnio,
+  porIsbn,
   porTitulo,
   porAutor,
   porAutorYTitulo,

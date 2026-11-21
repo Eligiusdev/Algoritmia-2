@@ -447,6 +447,27 @@ En una medición aleatoria con 4.000 libros, Merge Sort utilizó 42.913 comparac
 
 La medición de tiempo depende de la máquina y de la ejecución; el costo contable es estable: O(n log n) frente al crecimiento cuadrático de los tres algoritmos básicos.
 
+## Cierre del catálogo v1.0
+
+### Resumen de los 12 MiniRetos
+
+| MiniReto | Construcción completada | Conexión con el producto |
+|---|---|---|
+| 1. Estantería digital | Modelo y generador de 10.000 libros | Fuente de datos para todas las demostraciones |
+| 2. Buscar sin orden | Búsqueda lineal y contador de comparaciones | Consulta por título, autor y palabra |
+| 3. Buscar en orden | Búsqueda binaria iterativa y recursiva | Consulta por ISBN |
+| 4. Libro Abierto v0.1 | Buscador integrado y reporte | Base del catálogo demostrativo |
+| 5. Bubble Sort | Ordenamiento propio por año | Exhibición cronológica y línea base |
+| 6. Selección e inserción | Dos algoritmos alternativos | Comparación según estado inicial |
+| 7. Comparadores y estabilidad | Criterios compuestos por autor y título | Inventario y experimentos de estabilidad |
+| 8. Libro Abierto v0.2 | Laboratorio y decisiones iniciales | Método de medición ampliado |
+| 9. Merge Sort | Ordenamiento estable O(n log n) | Copias por ISBN y título |
+| 10. Quick Sort | Lomuto y mediana de tres | Alternativa in-place para equipos limitados |
+| 11. Top-K y prefijo | Ranking y autocompletar | Resultados visibles del catálogo final |
+| 12. Libro Abierto v1.0 | Integración, laboratorio y documentación | Demostración completa del sistema |
+
+El proyecto pasa de búsquedas individuales a una solución integrada: el catálogo genera datos, las copias se preparan con Merge Sort, las consultas exactas usan búsqueda binaria, las sugerencias usan límite inferior y recorrido acotado, y el ranking usa Top-K.
+
 ## Quick Sort
 
 `particion(arreglo, inicio, fin, comparar)` implementa el esquema de Lomuto tomando el último elemento como pivote. Devuelve el índice final del pivote. `quickSort(arreglo, comparar)` trabaja sobre una copia y divide recursivamente. `quickSortMedianaTres` reemplaza el último pivote por la mediana del primero, el centro y el último antes de particionar.

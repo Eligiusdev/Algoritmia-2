@@ -4,12 +4,12 @@ const {
   selectionSort,
   insertionSort,
   mergeSort,
-  quickSort,
   quickSortMedianaTres,
   porAnio
 } = require("./ordenamiento");
 
-const tamanios = [500, 1000, 2000, 4000];
+const tamaniosBasicos = [1000, 10000];
+const tamaniosAvanzados = [1000, 10000, 100000];
 
 function crearAleatorio(n) {
   let seed = 123456789;
@@ -57,112 +57,68 @@ function medir(fn, libros) {
   const inicio = process.hrtime.bigint();
   const resultado = fn([...libros], porAnio);
   const fin = process.hrtime.bigint();
-  const milisegundos = Number(fin - inicio) / 1000000;
-
-  const estado = estaOrdenado(resultado.arreglo, porAnio) ? "OK" : "FALLA";
 
   return {
     comparaciones: resultado.comparaciones,
     intercambios: resultado.intercambios,
-    tiempoMs: milisegundos,
-    estado
-  };
-}
-
-function medirSort(libros) {
-  const copia = [...libros];
-  const inicio = process.hrtime.bigint();
-  copia.sort((a, b) => porAnio(a, b));
-  const fin = process.hrtime.bigint();
-
-  return {
-    comparaciones: "-",
-    intercambios: "-",
     tiempoMs: Number(fin - inicio) / 1000000,
-    estado: estaOrdenado(copia, porAnio) ? "OK" : "FALLA"
+    estado: estaOrdenado(resultado.arreglo, porAnio) ? "OK" : "FALLA"
   };
 }
 
-console.log("=== LABORATORIO DE ORDENAMIENTO LIBRO ABIERTO v0.2 ===");
+console.log("=== LABORATORIO DE ORDENAMIENTO LIBRO ABIERTO v1.0 ===");
 
-for (const n of tamanios) {
+for (const n of tamaniosBasicos) {
   const filas = [];
-  const estados = crearEstados(n);
 
-  for (const [estadoDatos, libros] of estados) {
-    const bubble = medir(bubbleSort, libros);
-    const selection = medir(selectionSort, libros);
-    const insertion = medir(insertionSort, libros);
-    const merge = medir(mergeSort, libros);
-    const quick = medir(quickSort, libros);
-    const quickMediana = medir(quickSortMedianaTres, libros);
-    const sortNativo = medirSort(libros);
+  for (const [estadoDatos, libros] of crearEstados(n)) {
+    const algoritmos = [
+      ["Bubble Sort", bubbleSort],
+      ["Selection Sort", selectionSort],
+      ["Insertion Sort", insertionSort],
+      ["Merge Sort", mergeSort],
+      ["Quick Sort mediana de tres", quickSortMedianaTres]
+    ];
 
-    filas.push({
-      Estado: estadoDatos,
-      n,
-      Algoritmo: "Bubble Sort",
-      Comparaciones: bubble.comparaciones,
-      Intercambios: bubble.intercambios,
-      "Tiempo (ms)": bubble.tiempoMs.toFixed(3),
-      Verificacion: bubble.estado
-    });
-    filas.push({
-      Estado: estadoDatos,
-      n,
-      Algoritmo: "Selection Sort",
-      Comparaciones: selection.comparaciones,
-      Intercambios: selection.intercambios,
-      "Tiempo (ms)": selection.tiempoMs.toFixed(3),
-      Verificacion: selection.estado
-    });
-    filas.push({
-      Estado: estadoDatos,
-      n,
-      Algoritmo: "Insertion Sort",
-      Comparaciones: insertion.comparaciones,
-      Intercambios: insertion.intercambios,
-      "Tiempo (ms)": insertion.tiempoMs.toFixed(3),
-      Verificacion: insertion.estado
-    });
-    filas.push({
-      Estado: estadoDatos,
-      n,
-      Algoritmo: "Merge Sort",
-      Comparaciones: merge.comparaciones,
-      Intercambios: merge.intercambios,
-      "Tiempo (ms)": merge.tiempoMs.toFixed(3),
-      Verificacion: merge.estado
-    });
-    filas.push({
-      Estado: estadoDatos,
-      n,
-      Algoritmo: "sort",
-      Comparaciones: sortNativo.comparaciones,
-      Intercambios: sortNativo.intercambios,
-      "Tiempo (ms)": sortNativo.tiempoMs.toFixed(3),
-      Verificacion: sortNativo.estado
-    });
-    filas.push({
-      Estado: estadoDatos,
-      n,
-      Algoritmo: "Quick Sort pivote final",
-      Comparaciones: quick.comparaciones,
-      Intercambios: quick.intercambios,
-      "Tiempo (ms)": quick.tiempoMs.toFixed(3),
-      Verificacion: quick.estado
-    });
-    filas.push({
-      Estado: estadoDatos,
-      n,
-      Algoritmo: "Quick Sort mediana de tres",
-      Comparaciones: quickMediana.comparaciones,
-      Intercambios: quickMediana.intercambios,
-      "Tiempo (ms)": quickMediana.tiempoMs.toFixed(3),
-      Verificacion: quickMediana.estado
-    });
+    for (const [nombre, algoritmo] of algoritmos) {
+      const resultado = medir(algoritmo, libros);
+      filas.push({
+        Estado: estadoDatos,
+        n,
+        Algoritmo: nombre,
+        Comparaciones: resultado.comparaciones,
+        Intercambios: resultado.intercambios,
+        "Tiempo (ms)": resultado.tiempoMs.toFixed(3),
+        Verificacion: resultado.estado
+      });
+    }
   }
 
-  console.log(`\nTamaño n = ${n}`);
+  console.log(`\nTamaño básico n = ${n}`);
+  console.table(filas);
+}
+
+for (const n of tamaniosAvanzados) {
+  const filas = [];
+
+  for (const [estadoDatos, libros] of crearEstados(n)) {
+    for (const [nombre, algoritmo] of [
+      ["Merge Sort", mergeSort],
+      ["Quick Sort mediana de tres", quickSortMedianaTres]
+    ]) {
+      const resultado = medir(algoritmo, libros);
+      filas.push({
+        Estado: estadoDatos,
+        n,
+        Algoritmo: nombre,
+        Comparaciones: resultado.comparaciones,
+        Intercambios: resultado.intercambios,
+        "Tiempo (ms)": resultado.tiempoMs.toFixed(3),
+        Verificacion: resultado.estado
+      });
+    }
+  }
+
+  console.log(`\nTamaño avanzado n = ${n}`);
   console.table(filas);
 }
