@@ -1,17 +1,28 @@
 # Libro Abierto - Catálogo
 
-Proyecto base para modelar un catálogo de libros y generar datos de prueba para algoritmos de búsqueda.
-
-## Modelo
-
-Cada libro es un objeto con las propiedades `isbn`, `titulo`, `autor`, `año` y `prestamos`.
+Libro Abierto es un proyecto didáctico para modelar un catálogo de libros y practicar búsqueda lineal y binaria. Cada libro contiene `isbn`, `titulo`, `autor`, `año` y `prestamos`.
 
 ## Ejecución
 
-Genera y explora un catálogo de 10.000 libros:
+Desde la carpeta `libro-abierto-catalogo`:
+
+```bash
+node src/catalogo.js
+```
+
+También puede explorarse el catálogo base con:
 
 ```bash
 node src/explorar.js
 ```
 
-Los datos de muestra se encuentran en `src/muestra.js` y el generador en `src/generador.js`.
+## Consultas disponibles
+
+- Por título exacto: búsqueda lineal con retorno temprano.
+- Por autor: búsqueda lineal que devuelve todas las coincidencias.
+- Por palabra dentro del título: búsqueda lineal.
+- Por ISBN: búsqueda binaria iterativa.
+- Por ISBN en forma recursiva: búsqueda binaria recursiva.
+- Primera posición y todas las copias de un ISBN: búsqueda binaria de primera ocurrencia más recorrido hacia la derecha.
+
+El reporte integrado genera 10.000 libros, prepara una copia ordenada por ISBN y muestra el algoritmo, el resultado y las comparaciones de cada consulta. La opción `copiasRepetidas` del generador permite insertar ISBN repetidos para probar copias de distintas sedes.

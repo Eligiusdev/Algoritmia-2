@@ -133,3 +133,21 @@ El resultado no es fiable y puede devolver `null` aunque el ISBN exista. Por eso
 ```bash
 node -e "const m=require('./src/muestra'); const b=require('./src/busqueda'); console.log(b.buscarPorIsbn(m,'9789584264879'));"
 ```
+
+## Tabla de decisión del buscador integrado
+
+| Tipo de consulta | ¿Los datos están ordenados por ese campo? | Algoritmo elegido | Complejidad |
+|---|---|---|---|
+| Título exacto | No | Búsqueda lineal con retorno temprano | O(n) peor caso; O(1) mejor caso |
+| Autor | No | Búsqueda lineal completa | O(n) |
+| Palabra en el título | No | Búsqueda lineal completa | O(n) |
+| ISBN único | Sí, por una copia ordenada | Búsqueda binaria iterativa o recursiva | O(log n) |
+| Todas las copias de un ISBN | Sí, por una copia ordenada | Primera ocurrencia binaria y recorrido hacia la derecha | O(log n + k), donde k es el número de copias |
+
+El título, el autor y la palabra no tienen índice ni arreglo ordenado en esta versión, por lo que recorrer el catálogo es la opción adecuada. El ISBN sí está preparado en una copia ordenada, por lo que se usa búsqueda binaria. La variante de primera ocurrencia es necesaria porque una coincidencia binaria normal puede devolver cualquier copia del mismo ISBN.
+
+## Integración y copias repetidas
+
+El generador acepta `{ copiasRepetidas: c }`. Al generar `n` libros, reemplaza hasta `c` posiciones finales por ISBN ya existentes. Así mantiene el tamaño solicitado y permite probar copias de sedes sin modificar el comportamiento predeterminado.
+
+`src/catalogo.js` genera 10.000 libros y una copia ordenada con `sort`. Después muestra consultas por título, autor, palabra e ISBN, ambas formas binarias y la búsqueda de todas las copias. Para ISBN repetidos, `primeraPosicionIsbn` conserva el extremo izquierdo donde coincide y cuenta las copias recorriendo desde esa posición hacia la derecha hasta que cambia el ISBN.

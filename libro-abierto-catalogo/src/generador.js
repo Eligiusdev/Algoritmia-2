@@ -48,9 +48,17 @@ function enteroAleatorio(maximo) {
   return Math.floor(Math.random() * maximo);
 }
 
-function generarCatalogo(n) {
+function generarCatalogo(n, opciones = {}) {
   if (!Number.isInteger(n) || n < 0) {
     throw new RangeError("n debe ser un entero mayor o igual a 0");
+  }
+
+  const copiasRepetidas = opciones.copiasRepetidas === undefined
+    ? 0
+    : opciones.copiasRepetidas;
+
+  if (!Number.isInteger(copiasRepetidas) || copiasRepetidas < 0) {
+    throw new RangeError("copiasRepetidas debe ser un entero mayor o igual a 0");
   }
 
   const catalogo = [];
@@ -76,6 +84,14 @@ function generarCatalogo(n) {
       año: 1900 + enteroAleatorio(127),
       prestamos: enteroAleatorio(501)
     });
+  }
+
+  if (copiasRepetidas > 0) {
+    const copiasPermitidas = Math.min(copiasRepetidas, n);
+    for (let i = 0; i < copiasPermitidas; i += 1) {
+      const copia = catalogo[n - copiasPermitidas + i];
+      copia.isbn = catalogo[i].isbn;
+    }
   }
 
   return catalogo;

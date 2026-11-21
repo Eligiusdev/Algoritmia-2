@@ -136,6 +136,30 @@ function buscarPorIsbnRecursivo(librosOrdenados, isbn, inicio, fin) {
   };
 }
 
+function primeraPosicionIsbn(librosOrdenados, isbn, contador) {
+  const isbnBuscado = typeof isbn === "string" ? isbn.trim() : "";
+  let inicio = 0;
+  let fin = librosOrdenados.length - 1;
+  let primera = -1;
+
+  while (inicio <= fin) {
+    const medio = Math.floor((inicio + fin) / 2);
+    if (contador) contador.comparaciones += 1;
+    const comparacion = isbnBuscado.localeCompare(librosOrdenados[medio].isbn);
+
+    if (comparacion === 0) {
+      primera = medio;
+      fin = medio - 1;
+    } else if (comparacion < 0) {
+      fin = medio - 1;
+    } else {
+      inicio = medio + 1;
+    }
+  }
+
+  return primera;
+}
+
 module.exports = {
   normalizarTexto,
   buscarPorTitulo,
@@ -143,5 +167,6 @@ module.exports = {
   buscarPorPalabra,
   ordenarPorIsbn,
   buscarPorIsbn,
-  buscarPorIsbnRecursivo
+  buscarPorIsbnRecursivo,
+  primeraPosicionIsbn
 };
