@@ -97,4 +97,35 @@ function generarCatalogo(n, opciones = {}) {
   return catalogo;
 }
 
-module.exports = { generarCatalogo };
+function casiOrdenado(n, cambios) {
+  if (!Number.isInteger(n) || n < 0) {
+    throw new RangeError("n debe ser un entero mayor o igual a 0");
+  }
+  if (!Number.isInteger(cambios) || cambios < 0 || cambios > n) {
+    throw new RangeError("cambios debe ser un entero entre 0 y n");
+  }
+
+  const catalogo = [];
+
+  for (let i = 0; i < n; i += 1) {
+    catalogo.push({
+      isbn: `978${String(i).padStart(10, "0")}`,
+      titulo: `Libro ${i}`,
+      autor: "Autor",
+      año: 1900 + i,
+      prestamos: 0
+    });
+  }
+
+  if (cambios > 0) {
+    const inicio = n - cambios;
+
+    for (let i = inicio; i < n - 1; i += 2) {
+      [catalogo[i], catalogo[i + 1]] = [catalogo[i + 1], catalogo[i]];
+    }
+  }
+
+  return catalogo;
+}
+
+module.exports = { generarCatalogo, casiOrdenado };

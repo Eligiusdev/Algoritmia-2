@@ -206,3 +206,72 @@ Se midieron tres arreglos con objetos que tienen `año`: aleatorio determinista 
 | Invertido | Optimizada | 499.500 | 499.500 |
 
 El mejor caso de la versión optimizada es un arreglo ya ordenado: hace `n - 1 = 999` comparaciones y ningún intercambio, por lo que es O(n). El peor caso, como el arreglo invertido, conserva ambos componentes como sumas cuadráticas: comparaciones e intercambios son O(n²). Bubble Sort completo siempre mantiene una complejidad temporal O(n²) incluso si el arreglo está ordenado, por eso la optimización solo mejora el mejor caso.
+
+## Selection Sort e Insertion Sort
+
+`selectionSort(arreglo, comparar)` recorre el arreglo para encontrar el menor elemento de cada sufijo y realiza como máximo un intercambio por pasada. `insertionSort(arreglo, comparar)` toma cada elemento y lo desplaza hacia la izquierda mientras el elemento anterior sea mayor.
+
+Ambos crean una copia con `[...arreglo]`; no modifican el arreglo recibido.
+
+### Traza de Selection Sort
+
+Arreglo inicial:
+
+```text
+[2006, 1967, 2004, 1924, 1999]
+```
+
+1. Pasada `i = 0`: el mínimo es `1924`; intercambia con `2006`.
+   Resultado: `[1924, 1967, 2004, 2006, 1999]`
+2. Pasada `i = 1`: el mínimo del sufijo es `1967`; ya está en la posición correcta.
+   Resultado: `[1924, 1967, 2004, 2006, 1999]`
+3. Pasada `i = 2`: el mínimo es `1999`; intercambia con `2004`.
+   Resultado: `[1924, 1967, 1999, 2006, 2004]`
+4. Pasada `i = 3`: el mínimo del sufijo es `2004`; intercambia con `2006`.
+   Resultado: `[1924, 1967, 1999, 2004, 2006]`
+
+Después de las cuatro pasadas, no quedan elementos fuera de su posición. Esta traza usa 10 comparaciones y 3 intercambios.
+
+### Traza de Insertion Sort
+
+Arreglo inicial:
+
+```text
+[2006, 1967, 2004, 1924, 1999]
+```
+
+1. Inserta `1967`: `[1967, 2006, 2004, 1924, 1999]`
+2. Inserta `2004`: `[1967, 2004, 2006, 1924, 1999]`
+3. Inserta `1924`: `[1924, 1967, 2004, 2006, 1999]`
+4. Inserta `1999`: `[1924, 1967, 1999, 2004, 2006]`
+
+La traza tiene 9 comparaciones y 7 desplazamientos contados como intercambios.
+
+### Datos casi ordenados
+
+`casiOrdenado(n, cambios)` genera primero años de `1900` a `1900 + n - 1` y después intercambia pares al final. Por ejemplo, con `n = 2.000` y `cambios = 20`, los últimos 20 elementos contienen unas pocas posiciones fuera de lugar y el resto conserva el orden.
+
+### Mediciones con 2.000 libros
+
+| Estado | Algoritmo | Comparaciones | Intercambios |
+|---|---|---:|---:|
+| Aleatorio | Bubble Sort | 1.993.329 | 1.014.144 |
+| Aleatorio | Selection Sort | 1.999.000 | 1.992 |
+| Aleatorio | Insertion Sort | 1.016.136 | 1.014.144 |
+| Ordenado | Bubble Sort optimizado | 1.999 | 0 |
+| Ordenado | Selection Sort | 1.999.000 | 0 |
+| Ordenado | Insertion Sort | 1.999 | 0 |
+| Invertido | Bubble Sort optimizado | 1.999.000 | 1.999.000 |
+| Invertido | Selection Sort | 1.999.000 | 1.000 |
+| Invertido | Insertion Sort | 1.999.000 | 1.999.000 |
+| Casi ordenado | Bubble Sort optimizado | 3.997 | 10 |
+| Casi ordenado | Selection Sort | 1.999.000 | 10 |
+| Casi ordenado | Insertion Sort | 2.009 | 10 |
+
+**¿Cuál hace menos intercambios?** Selection Sort hace el menor número: como máximo `n - 1` intercambios, frente a los desplazamientos de Insertion Sort y los intercambios adyacentes de Bubble Sort. En los estados medidos empleó 0, 1.992 o 1.000 intercambios.
+
+**¿Cuál aprovecha mejor los datos casi ordenados?** Insertion Sort aprovecha mejor ese estado. Con 2.000 libros hizo solo 2.009 comparaciones y 10 desplazamientos frente a 1.999.000 comparaciones de Selection Sort.
+
+**¿Cuál hace siempre la misma cantidad de comparaciones?** Selection Sort hace siempre `n(n - 1) / 2` comparaciones en esta versión, aproximadamente 1.999.000 para `n = 2.000`, sin importar si está ordenado, invertido o casi ordenado. Bubble Sort optimizado e Insertion Sort sí reducen trabajo según el estado inicial.
+
+Aunque las mediciones cambien mucho, los tres tienen peor caso O(n²): Bubble Sort e Insertion Sort pueden hacer aproximadamente `n²/2` comparaciones y desplazamientos en un arreglo invertido; Selection Sort hace `n(n - 1)/2` comparaciones en cualquier arreglo y hasta O(n) intercambios. El peor crecimiento sigue siendo cuadrático, aunque Selection Sort tenga menos intercambios y Insertion Sort aproveche estados casi ordenados.
