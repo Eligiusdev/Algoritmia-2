@@ -218,3 +218,52 @@ Los códigos se mantienen dentro del mismo árbol binario de búsqueda y no se r
 | 33 | No existe; devuelve `null` | Termina al encontrar el vacío |
 
 La ampliación conserva los resultados requeridos: `buscar(50)` realiza una comparación y `buscar(59)` realiza siete. El árbol completo contiene 88 nodos y conserva `50 San Antonio` como raíz.
+
+## Recorridos del índice binario
+
+Los recorridos se verificaron antes de ejecutarlos sobre el árbol original de los 20 códigos indicados inicialmente:
+
+`50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45, 52, 56, 65, 90, 27, 29, 54, 58, 59`.
+
+### Predicción de inorden
+
+Inorden visita primero el subárbol izquierdo, luego el nodo y después el subárbol derecho. La secuencia esperada y obtenida es:
+
+```text
+10, 20, 25, 27, 29, 30, 35, 40, 45, 50, 52, 54, 56, 58, 59, 60, 65, 70, 80, 90
+```
+
+Esta secuencia corresponde a un listado ascendente. En Ruta Paisa se usa para generar tableros informativos con las estaciones ordenadas por código.
+
+### Predicción de preorden
+
+Preorden visita el padre antes que sus hijos. La secuencia esperada y obtenida es:
+
+```text
+50, 30, 20, 10, 25, 27, 29, 40, 35, 45, 70, 60, 52, 56, 54, 58, 59, 65, 80, 90
+```
+
+Se exportaron estos códigos a un arreglo, se reconstruyó un árbol nuevo insertándolos en ese mismo orden y se confirmó que su forma coincide exactamente con la del original.
+
+En Ruta Paisa, preorden permite exportar el índice completo con la información necesaria para reconstruirlo idéntico en otro servidor.
+
+### Predicción de postorden
+
+Postorden visita primero los hijos y después el padre. La secuencia esperada y obtenida es:
+
+```text
+10, 29, 27, 25, 20, 35, 45, 40, 30, 54, 59, 58, 56, 52, 65, 60, 90, 80, 70, 50
+```
+
+Este recorrido contó 20 nodos. En Ruta Paisa es adecuado para liberar el índice al reiniciar el sistema, porque los nodos hijos se procesan antes que el padre y no quedan referencias a liberar por debajo.
+
+### Altura y hojas
+
+Para el árbol original de 20 nodos:
+
+- **Altura calculada:** 6 aristas desde la raíz hasta una hoja profunda.
+- **Número de hojas:** 8.
+- **Altura mínima posible:** para 20 nodos, una altura mínima teórica de 4 aristas.
+- La altura real es mayor porque el árbol se formó siguiendo el orden de inserción y no quedó completamente equilibrado.
+
+La altura mínima se calcula con `ceil(log₂(20 + 1)) - 1 = 4`. Como `4 < 6`, el índice podría mejorar su equilibrio, pero el recorrido preorden permite reconstruir exactamente el árbol actual sin aplicar otro reordenamiento.

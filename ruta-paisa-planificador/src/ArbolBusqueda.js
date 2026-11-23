@@ -65,6 +65,76 @@ class ArbolBusqueda {
 
     return null;
   }
+
+  inorden(callback = () => {}) {
+    let visitados = 0;
+
+    const recorrer = (nodo) => {
+      if (nodo === null) return;
+      recorrer(nodo.izquierdo);
+      callback(nodo);
+      visitados++;
+      recorrer(nodo.derecho);
+    };
+
+    recorrer(this.raiz);
+    return visitados;
+  }
+
+  preorden(callback = () => {}) {
+    let visitados = 0;
+
+    const recorrer = (nodo) => {
+      if (nodo === null) return;
+      callback(nodo);
+      visitados++;
+      recorrer(nodo.izquierdo);
+      recorrer(nodo.derecho);
+    };
+
+    recorrer(this.raiz);
+    return visitados;
+  }
+
+  postorden(callback = () => {}) {
+    let visitados = 0;
+
+    const recorrer = (nodo) => {
+      if (nodo === null) return;
+      recorrer(nodo.izquierdo);
+      recorrer(nodo.derecho);
+      callback(nodo);
+      visitados++;
+    };
+
+    recorrer(this.raiz);
+    return visitados;
+  }
+
+  altura() {
+    const calcular = (nodo) => {
+      if (nodo === null) return -1;
+      return 1 + Math.max(calcular(nodo.izquierdo), calcular(nodo.derecho));
+    };
+
+    return calcular(this.raiz);
+  }
+
+  contarHojas() {
+    const contar = (nodo) => {
+      if (nodo === null) return 0;
+      if (nodo.izquierdo === null && nodo.derecho === null) return 1;
+      return contar(nodo.izquierdo) + contar(nodo.derecho);
+    };
+
+    return contar(this.raiz);
+  }
+
+  contarNodos() {
+    let total = 0;
+    this.inorden(() => total++);
+    return total;
+  }
 }
 
 const arbolEstaciones = new ArbolBusqueda();
@@ -91,6 +161,37 @@ const codigosEstaciones = new Map([
   [58, "Floresta"],
   [59, "San Javier"]
 ]);
+
+const codigosEstaciones20 = new Map(codigosEstaciones);
+
+const arbol20 = new ArbolBusqueda();
+for (const [codigo, estacion] of codigosEstaciones20) {
+  arbol20.insertar(codigo, estacion);
+}
+
+const codigosInorden = [];
+arbol20.inorden((nodo) => codigosInorden.push(nodo.codigo));
+
+const codigosPreorden = [];
+arbol20.preorden((nodo) => codigosPreorden.push(nodo.codigo));
+
+const arbolReconstruido = new ArbolBusqueda();
+for (let i = 0; i < codigosPreorden.length; i++) {
+  const codigo = codigosPreorden[i];
+  arbolReconstruido.insertar(codigo, codigosEstaciones20.get(codigo));
+}
+
+function forma(nodo) {
+  if (nodo === null) return null;
+  return [nodo.codigo, forma(nodo.izquierdo), forma(nodo.derecho)];
+}
+
+const codigosPostorden = [];
+const nodosPostorden = arbol20.postorden((nodo) => codigosPostorden.push(nodo.codigo));
+const formaCoincide = JSON.stringify(forma(arbol20.raiz)) ===
+  JSON.stringify(forma(arbolReconstruido.raiz));
+const altura20 = arbol20.altura();
+const alturaMinima20 = Math.ceil(Math.log2(20 + 1)) - 1;
 
 const estacionesRed = [
   "Niquía", "Bello", "Madera", "Acevedo", "Tricentenario", "Caribe",
@@ -132,12 +233,30 @@ console.log("10:", arbolEstaciones.buscar(10));
 console.log("45:", arbolEstaciones.buscar(45));
 console.log("100:", arbolEstaciones.buscar(100));
 console.log("33:", arbolEstaciones.buscar(33));
+console.log("Inorden 20:", codigosInorden);
+console.log("Preorden 20:", codigosPreorden);
+console.log("Postorden 20:", codigosPostorden);
+console.log("Postorden contó:", nodosPostorden);
+console.log("Forma reconstruida:", formaCoincide);
+console.log("Altura 20:", altura20);
+console.log("Hojas 20:", arbol20.contarHojas());
+console.log("Altura mínima 20:", alturaMinima20);
 
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     NodoBinario,
     ArbolBusqueda,
     codigosEstaciones,
-    estacionesRed
+    estacionesRed,
+    codigosEstaciones20,
+    arbol20,
+    codigosInorden,
+    codigosPreorden,
+    codigosPostorden,
+    arbolReconstruido,
+    formaCoincide,
+    forma,
+    altura20,
+    alturaMinima20
   };
 }
