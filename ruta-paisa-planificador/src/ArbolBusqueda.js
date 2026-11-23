@@ -66,6 +66,51 @@ class ArbolBusqueda {
     return null;
   }
 
+  minimo() {
+    if (this.raiz === null) return null;
+
+    let actual = this.raiz;
+    while (actual.izquierdo !== null) {
+      actual = actual.izquierdo;
+    }
+    return actual.estacion;
+  }
+
+  maximo() {
+    if (this.raiz === null) return null;
+
+    let actual = this.raiz;
+    while (actual.derecho !== null) {
+      actual = actual.derecho;
+    }
+    return actual.estacion;
+  }
+
+  rango(desde, hasta) {
+    const estaciones = [];
+
+    if (desde > hasta) return estaciones;
+
+    const recorrer = (nodo) => {
+      if (nodo === null) return;
+
+      if (desde < nodo.codigo) {
+        recorrer(nodo.izquierdo);
+      }
+
+      if (nodo.codigo >= desde && nodo.codigo <= hasta) {
+        estaciones.push(nodo.estacion);
+      }
+
+      if (hasta > nodo.codigo) {
+        recorrer(nodo.derecho);
+      }
+    };
+
+    recorrer(this.raiz);
+    return estaciones;
+  }
+
   inorden(callback = () => {}) {
     let visitados = 0;
 
@@ -227,20 +272,22 @@ for (const [codigo, estacion] of codigosEstaciones) {
   arbolEstaciones.insertar(codigo, estacion);
 }
 
-console.log("50:", arbolEstaciones.buscar(50));
-console.log("59:", arbolEstaciones.buscar(59));
-console.log("10:", arbolEstaciones.buscar(10));
-console.log("45:", arbolEstaciones.buscar(45));
-console.log("100:", arbolEstaciones.buscar(100));
-console.log("33:", arbolEstaciones.buscar(33));
-console.log("Inorden 20:", codigosInorden);
-console.log("Preorden 20:", codigosPreorden);
-console.log("Postorden 20:", codigosPostorden);
-console.log("Postorden contó:", nodosPostorden);
-console.log("Forma reconstruida:", formaCoincide);
-console.log("Altura 20:", altura20);
-console.log("Hojas 20:", arbol20.contarHojas());
-console.log("Altura mínima 20:", alturaMinima20);
+if (require.main === module) {
+  console.log("50:", arbolEstaciones.buscar(50));
+  console.log("59:", arbolEstaciones.buscar(59));
+  console.log("10:", arbolEstaciones.buscar(10));
+  console.log("45:", arbolEstaciones.buscar(45));
+  console.log("100:", arbolEstaciones.buscar(100));
+  console.log("33:", arbolEstaciones.buscar(33));
+  console.log("Inorden 20:", codigosInorden);
+  console.log("Preorden 20:", codigosPreorden);
+  console.log("Postorden 20:", codigosPostorden);
+  console.log("Postorden contó:", nodosPostorden);
+  console.log("Forma reconstruida:", formaCoincide);
+  console.log("Altura 20:", altura20);
+  console.log("Hojas 20:", arbol20.contarHojas());
+  console.log("Altura mínima 20:", alturaMinima20);
+}
 
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {

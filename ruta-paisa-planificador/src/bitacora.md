@@ -267,3 +267,80 @@ Para el árbol original de 20 nodos:
 - La altura real es mayor porque el árbol se formó siguiendo el orden de inserción y no quedó completamente equilibrado.
 
 La altura mínima se calcula con `ceil(log₂(20 + 1)) - 1 = 4`. Como `4 < 6`, el índice podría mejorar su equilibrio, pero el recorrido preorden permite reconstruir exactamente el árbol actual sin aplicar otro reordenamiento.
+
+## Consultas de mínimo, máximo y rango
+
+El índice permite obtener el primer y último código sin recorrer todos los nodos:
+
+- `minimo()` sigue exclusivamente los enlaces izquierdos hasta llegar al nodo más izquierdo.
+- `maximo()` sigue exclusivamente los enlaces derechos hasta llegar al nodo más derecho.
+
+Sobre el árbol original de 20 estaciones, el mínimo es **Niquía** con código `10` y el máximo es **La Estrella** con código `90`.
+
+Para el rango de la zona norte, `rango(10, 30)` recorre en inorden solamente las regiones que pueden contener resultados. El orden esperado y obtenido es:
+
+```text
+10 Niquía
+20 Bello
+25 Acevedo
+27 Andalucía
+29 Santo Domingo
+30 Caribe
+```
+
+`rango` poda el subárbol izquierdo cuando el nodo supera el límite máximo y poda el subárbol derecho cuando el nodo queda debajo del límite mínimo.
+
+## Árbol degenerado por inserción ascendente
+
+Las 20 estaciones se insertaron también desde `10` hasta `90` en orden ascendente:
+
+```text
+10
+ \
+  20
+   \
+    25
+     \
+      27
+       \
+        29
+         \
+          30
+           \
+            35
+             \
+              40
+               \
+                45
+                 \
+                  50
+                   \
+                    52
+                     \
+                      54
+                       \
+                        56
+                         \
+                          58
+                           \
+                            59
+                             \
+                              60
+                               \
+                                65
+                                 \
+                                  70
+                                   \
+                                    80
+                                     \
+                                      90
+```
+
+Cada código nuevo es mayor que el nodo anterior, por lo que se agrega siempre como hijo derecho. El árbol deja de dividir los datos en dos ramas y se convierte en una lista enlazada.
+
+- **Altura en aristas:** 19.
+- **Cantidad de niveles:** 20, contando la raíz como nivel 1.
+- **Complejidad balanceada:** búsqueda, inserción y mínimo recorrido esperado en `O(log n)`.
+- **Complejidad degenerada:** búsqueda e inserción en `O(n)`.
+
+Al buscar San Javier en el árbol ascendente, el recorrido visita los 15 primeros códigos hasta encontrar `59`, por lo que realiza 15 comparaciones. Para La Estrella (`90`) realiza 20 comparaciones porque es el último nodo de la cadena.
