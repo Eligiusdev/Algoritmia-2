@@ -344,3 +344,140 @@ Cada código nuevo es mayor que el nodo anterior, por lo que se agrega siempre c
 - **Complejidad degenerada:** búsqueda e inserción en `O(n)`.
 
 Al buscar San Javier en el árbol ascendente, el recorrido visita los 15 primeros códigos hasta encontrar `59`, por lo que realiza 15 comparaciones. Para La Estrella (`90`) realiza 20 comparaciones porque es el último nodo de la cadena.
+
+## Grafo no dirigido de la red
+
+Las conexiones directas se representan con vértices identificados por código. La red contiene 20 estaciones y 21 conexiones. Los nombres se obtienen reutilizando `codigosEstaciones20`, que funciona como índice del Día 1.
+
+### Líneas y conexiones
+
+- **Línea A:** `10-20-30-35-40-45-50-60-65-70-80-90`.
+- **Línea B:** `50-52-54-56-58-59`.
+- **Línea K:** `30-25-27-29`.
+- **Línea T:** `40-56-65`.
+
+```text
+10 Niquía
+ |
+20 Bello
+ |
+30 Caribe -------- 25 Acevedo
+ |                    |
+35 Universidad        27 Andalucía
+ |                    |
+40 Hospital           29 Santo Domingo
+ |\________
+ |         56 Estadio
+45 Parque Berrío  / | \
+                  50 San Antonio--52 Cisneros--54 Suramericana
+                  /  |
+               60 Exposiciones
+                  |
+               65 Industriales
+                  |
+               70 Poblado
+                  |
+               80 Itagüí
+                  |
+               90 La Estrella
+```
+
+El dibujo simplificado debe interpretarse junto con la lista exacta de adyacencia siguiente:
+
+```text
+10 -> [20]
+20 -> [10, 30]
+30 -> [20, 35, 25]
+35 -> [30, 40]
+40 -> [35, 45, 56]
+45 -> [40, 50]
+50 -> [45, 60, 52]
+60 -> [50, 65]
+65 -> [60, 70, 56]
+70 -> [65, 80]
+80 -> [70, 90]
+90 -> [80]
+
+25 -> [30, 27]
+27 -> [25, 29]
+29 -> [27]
+
+52 -> [50, 54]
+54 -> [52, 56]
+56 -> [54, 58, 40, 65]
+58 -> [56, 59]
+59 -> [58]
+```
+
+### Estaciones de transbordo
+
+Se consideran transbordos los vértices cuyo grado sea mayor que 2:
+
+| Código | Estación | Grado |
+|---:|---|---:|
+| 30 | Caribe | 3 |
+| 40 | Hospital | 3 |
+| 50 | San Antonio | 3 |
+| 56 | Estadio | 4 |
+| 65 | Industriales | 3 |
+
+### Por qué se usa un grafo
+
+San Antonio, Caribe y las demás estaciones compartidas pueden pertenecer a varias líneas. Un grafo permite tener un único vértice por estación y varias aristas hacia sus vecinos. Así no se duplican estaciones ni se obliga a elegir un único padre, como ocurría en el árbol.
+
+### Lista de adyacencia frente a matriz
+
+Para `V = 20` estaciones:
+
+- Una matriz necesita `20 × 20 = 400` posiciones, aunque la red tenga solo 21 conexiones.
+- La lista necesita una entrada por cada vértice y dos referencias por arista no dirigida. Guarda aproximadamente `20` conjuntos de vértices más `42` referencias en esta red.
+- Consultar los vecinos de una estación cuesta `O(grado(v))` en la lista y `O(V)` al recorrer una fila completa de la matriz.
+- Consultar si existe una conexión directa cuesta `O(1)` esperado con `Set` en la lista y `O(1)` en la matriz.
+
+La lista de adyacencia es más conveniente para esta red dispersa: tiene `V = 20` y `E = 21`, una densidad baja. También permite recorrer directamente los vecinos de los transbordos sin revisar las 400 posiciones de una matriz.
+
+## DFS, componentes conectados y estaciones críticas
+
+Se agregaron `dfs(inicio, cerradas)` recursivo, `dfsIterativo(inicio, cerradas)` con pila explícita y `componentes(cerradas)`. Ambos recorridos devuelven un `Set` de códigos visitados; las estaciones cerradas se omiten, incluso si se intenta comenzar el recorrido desde una estación cerrada. La búsqueda de vecinos utiliza la lista de adyacencia, por lo que un recorrido y el cálculo de componentes cuestan `O(V + E)`.
+
+### Traza recursiva desde Santo Domingo
+
+Con la red completa, los primeros seis pasos (pila de llamadas desde la raíz hasta la llamada actual) son:
+
+1. `Santo Domingo`
+2. `Santo Domingo → Andalucía`
+3. `Santo Domingo → Andalucía → Acevedo`
+4. `Santo Domingo → Andalucía → Acevedo → Caribe`
+5. `Santo Domingo → Andalucía → Acevedo → Caribe → Bello`
+6. `Santo Domingo → Andalucía → Acevedo → Caribe → Bello → Niquía`
+
+La traza sigue el orden de vecinos de la lista de adyacencia. Desde Santo Domingo se alcanzan las 20 estaciones; también se comprobó que ambos DFS alcanzan las 20 desde cada estación y que los conjuntos recursivo e iterativo coinciden.
+
+### Cierre de Estadio
+
+Al cerrar Estadio (`56`), el reporte obtiene dos componentes:
+
+- Componente principal (17 estaciones): Niquía, Bello, Acevedo, Andalucía, Santo Domingo, Caribe, Universidad, Hospital, Parque Berrío, San Antonio, Cisneros, Suramericana, Exposiciones, Industriales, Poblado, Itagüí y La Estrella.
+- Aisladas del componente principal: **Floresta (58)** y **San Javier (59)**.
+
+Estadio también es crítica: su cierre deja precisamente esos dos componentes.
+
+### Estaciones críticas y justificación
+
+Una estación es crítica si al cerrarla quedan dos o más componentes. Cada grupo de la tabla es un componente conectado independiente que produjo `componentes(new Set([código]))`; los nombres se listan por código para compactar el registro. Las otras estaciones no son críticas porque su cierre deja una sola componente.
+
+| Estación cerrada | Componentes que quedan |
+|---|---|
+| Bello (20) | `{10}`; `{25, 27, 29, 30, 35, 40, 45, 50, 52, 54, 56, 58, 59, 60, 65, 70, 80, 90}` |
+| Caribe (30) | `{10, 20}`; `{35, 40, 45, 50, 52, 54, 56, 58, 59, 60, 65, 70, 80, 90}`; `{25, 27, 29}` |
+| Universidad (35) | `{10, 20, 25, 27, 29, 30}`; `{40, 45, 50, 52, 54, 56, 58, 59, 60, 65, 70, 80, 90}` |
+| Hospital (40) | `{10, 20, 25, 27, 29, 30, 35}`; `{45, 50, 52, 54, 56, 58, 59, 60, 65, 70, 80, 90}` |
+| Industriales (65) | `{10, 20, 25, 27, 29, 30, 35, 40, 45, 50, 52, 54, 56, 58, 59, 60}`; `{70, 80, 90}` |
+| Poblado (70) | `{10, 20, 25, 27, 29, 30, 35, 40, 45, 50, 52, 54, 56, 58, 59, 60, 65}`; `{80, 90}` |
+| Itagüí (80) | `{10, 20, 25, 27, 29, 30, 35, 40, 45, 50, 52, 54, 56, 58, 59, 60, 65, 70}`; `{90}` |
+| Estadio (56) | `{10, 20, 25, 27, 29, 30, 35, 40, 45, 50, 52, 54, 60, 65, 70, 80, 90}`; `{58, 59}` |
+| Floresta (58) | `{10, 20, 25, 27, 29, 30, 35, 40, 45, 50, 52, 54, 56, 60, 65, 70, 80, 90}`; `{59}` |
+| Acevedo (25) | `{10, 20, 30, 35, 40, 45, 50, 52, 54, 56, 58, 59, 60, 65, 70, 80, 90}`; `{27, 29}` |
+| Andalucía (27) | `{10, 20, 25, 30, 35, 40, 45, 50, 52, 54, 56, 58, 59, 60, 65, 70, 80, 90}`; `{29}` |
+
+El barrido prueba el cierre individual de cada vértice, calculando componentes en cada prueba; por eso el análisis completo de criticidad con este método directo cuesta `O(V(V + E))`. La complejidad `O(V + E)` corresponde a cada DFS y a cada cálculo individual de componentes.
