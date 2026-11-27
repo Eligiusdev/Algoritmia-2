@@ -23,7 +23,6 @@ function totalVendidoInstrumentado(ventas, contador) {
   let total = 0;
   for (const venta of ventas) {
     contador.operaciones += 1;
-    contador.operaciones += 1;
     if (venta.cantidad > 0) {
       total += valorVenta(venta);
     }
@@ -62,7 +61,6 @@ function ventaMayorInstrumentada(ventas, contador) {
   let montoMaximo = -1;
 
   for (const venta of ventas) {
-    contador.operaciones += 1;
     contador.operaciones += 1;
     if (venta.cantidad > 0) {
       const montoActual = valorVenta(venta);
@@ -104,7 +102,22 @@ function ventasPorCiudad(ventas, ciudad) {
   }
   return totalCiudad;
 }
+function totalPorCiudad(ventas) {
+  const total = {};
+  if (!Array.isArray(ventas)) return total;
 
+  for (const venta of ventas) {
+    if (!venta || typeof venta.ciudad !== "string" || venta.cantidad <= 0) {
+      continue;
+    }
+    const ciudad = venta.ciudad.trim().toLowerCase();
+    const subtotal = valorVenta(venta);
+    if (Number.isFinite(subtotal)) {
+      total[ciudad] = (total[ciudad] || 0) + subtotal;
+    }
+  }
+  return total;
+}
 /**
  * ==========================================
  * PARTE 2: VERSIONES CON MÉTODOS DE ARREGLO

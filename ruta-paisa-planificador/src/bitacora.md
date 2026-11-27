@@ -606,3 +606,76 @@ Cada ronda contempla 20 minutos de resolución y 5 minutos de retroalimentación
 | 1 | Integrante 2 | Integrante 1 | Integrante 3 |
 | 2 | Integrante 3 | Integrante 2 | Integrante 1 |
 | 3 | Integrante 1 | Integrante 3 | Integrante 2 |
+
+## Segunda entrevista: demanda y estaciones más usadas
+
+### Protocolo en voz alta: respuesta del candidato
+
+**Reformulación.** “Tengo 20 conteos consecutivos, uno por minuto, desde las 6:00 hasta las 6:19. Debo hallar la ventana de `k` minutos con mayor suma y reportar su minuto de inicio y total. Después debo contar las validaciones agrupadas por estación y devolver las `k` estaciones con mayor frecuencia.”
+
+**Señales del enunciado.** “Minutos consecutivos” indica una ventana deslizante de tamaño fijo: sumo la primera ventana y, al avanzar, agrego el dato nuevo y resto el que sale. “Estaciones más usadas” indica conteo de frecuencias, que guardaré en un `Map`.
+
+**Preguntas para el entrevistador.**
+
+- ¿Los 20 conteos corresponden a minutos sin huecos? Asumo que sí: índice 0 es 6:00 y cada índice avanza un minuto.
+- ¿Los extremos de una ventana cuentan ambos? Sí; una ventana de 5 incluye exactamente 5 valores.
+- Si dos ventanas empatan, ¿cuál devuelvo? Asumo la primera, conservando el máximo solo cuando aparece una suma estrictamente mayor.
+- ¿Las estaciones de las validaciones pertenecen al índice de la red? Para el generador de prueba asumiré que sí; selecciono al azar entre los 20 códigos existentes.
+- ¿Cómo se resuelven empates en frecuencias? El ordenamiento conserva el orden de primera aparición de las claves del `Map`.
+
+**Fuerza bruta para la hora pico.** Sumaria cada ventana desde cero: hay `n-k+1` ventanas de `k` valores, por lo que cuesta `O((n-k+1)k)`, que en el peor caso es `O(nk)`. Para las estaciones, contar con un arreglo y volver a buscar cada estación puede costar `O(nu)` para `u` estaciones únicas.
+
+**Optimización comunicada.** Para la demanda, calculo una suma inicial de `k` elementos y luego recorro el resto una sola vez: `suma = suma + nuevo - saliente`. El tiempo es `O(n)` y el espacio auxiliar `O(1)`. Para frecuencias, acumulo en un `Map` en `O(n)` esperado, ordeno las `u` entradas por conteo descendente en `O(u log u)` y tomo las primeras `k`; el total es `O(n + u log u)` tiempo y `O(u)` espacio.
+
+### Recorrido de la ventana deslizante
+
+La ventana inicial, de 6:00 a 6:04, suma `120 + 135 + 150 + 180 + 210 = 795`. En cada paso quito el minuto que sale y agrego el que entra:
+
+| Inicio | Total de la ventana de 5 minutos |
+|---|---:|
+| 6:00 | 795 |
+| 6:01 | 935 |
+| 6:02 | 1.110 |
+| 6:03 | 1.300 |
+| 6:04 | 1.450 |
+| 6:05 | 1.540 |
+| 6:06 | 1.560 |
+| 6:07 | 1.500 |
+| 6:08 | 1.400 |
+| 6:09 | 1.330 |
+| 6:10 | 1.320 |
+| 6:11 | 1.360 |
+| 6:12 | 1.460 |
+| 6:13 | 1.580 |
+| 6:14 | **1.630** |
+| 6:15 | 1.610 |
+
+Por lo tanto, `horaPico(porMinuto, 5)` devuelve `{ minutoInicio: "6:14", total: 1630 }`. Para `k` positivo que supera el número de datos devuelve `null`; un tamaño no positivo o no entero es inválido.
+
+### Conteo de estaciones y mejora para top 3
+
+El programa genera 50.000 registros con códigos escogidos al azar de `codigosEstaciones20` y calcula las tres estaciones con más validaciones. Los conteos concretos cambian en cada ejecución porque los datos son aleatorios; la función devuelve `{ estacion, cantidad }` ordenados de mayor a menor frecuencia.
+
+Si solo hacen falta las tres primeras, no es necesario ordenar todas las `u` estaciones: después del conteo en `Map`, se puede recorrer sus entradas y mantener un min-heap de tamaño 3. El coste del conteo sigue siendo `O(n)`; mantener el heap cuesta `O(u log 3)`, y el espacio total es `O(u + 3)` por el `Map` y el heap. Se evita ordenar las `u` entradas completas (`O(u log u)`).
+
+### Pistas progresivas y evaluación del segundo simulacro
+
+En esta resolución escrita no hubo bloqueo de más de tres minutos, así que se registran **0 pistas utilizadas**. La entrevista no fue observada ni cronometrada en vivo; esta cifra y la evaluación siguiente describen el simulacro textual y deben contrastarse con el trío real.
+
+Escala: 1 = requiere apoyo, 2 = en progreso, 3 = competente, 4 = destacado. La evaluación recibida es **simulada**, no se atribuye a un compañero real.
+
+| Criterio | Puntaje simulado | Evidencia / comentario del observador |
+|---|---:|---|
+| Comprensión | 4/4 | Reconoce la ventana deslizante y el conteo de frecuencias a partir de las señales del enunciado. |
+| Diseño | 4/4 | Mantiene una suma incremental y usa `Map` más ordenamiento para el ranking. |
+| Corrección | 4/4 | Devuelve 6:14 y 1.630; el generador selecciona estaciones del índice de la red. |
+| Complejidad | 4/4 | Distingue `O(n)` de la ventana, `O(n + u log u)` del ordenamiento y propone heap `O(n + u log 3)` para top 3. |
+| Comunicación | 3/4 | Explica la actualización del total paso a paso. Oportunidad: precisar el comportamiento de ventanas/frecuencias empatadas antes de implementar. |
+
+**Fortaleza recibida (simulada):** reconoció rápidamente las dos señales y justificó por qué se resta el valor que sale de la ventana. **Oportunidad recibida (simulada):** aclarar primero las reglas de empate y cómo se interpretan los minutos faltantes.
+
+**Autoevaluación:** comprensión 4/4, diseño 4/4, corrección 4/4, complejidad 4/4 y comunicación 3/4. Fortaleza: mantuve el algoritmo de ventana en una sola pasada y contrasté la solución ordenada con una alternativa top 3. Mejora: presentar los costes en función de `n` y `u` desde el principio y confirmar si los datos de minutos son contiguos.
+
+### Rotación del trío
+
+Se conserva el formato del MiniReto 9: 20 minutos para resolver y 5 para retroalimentar. Para rotar respecto a la ronda anterior, el orden planeado de candidatos es Integrante 2, Integrante 3 e Integrante 1; sustituir los rótulos por los nombres del equipo y registrar la participación real.

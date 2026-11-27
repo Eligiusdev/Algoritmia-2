@@ -1,14 +1,14 @@
 const ventas = require("./datos");
 
-console.log("=== EXPLORACIÓN DE VENTAS: CAFÉ ORIGEN ===\n");
+console.log("=== EXPLORACION DE VENTAS: CAFE ORIGEN ===\n");
 
 // 1. Cantidad total de registros
 console.log("Cantidad de registros:", ventas.length);
 
-// 2. Primer registro (índice 0)
+// 2. Primer registro (indice 0)
 console.log("\nPrimer registro:", ventas[0]);
 
-// 3. Último registro (usando length - 1)
+// 3. Ultimo registro (usando length - 1)
 console.log("\nÚltimo registro:", ventas[ventas.length - 1]);
 
 // 4. Propiedad 'producto' del registro en la posición 4 (índice 4 -> 5to elemento, id: 5)
@@ -23,7 +23,8 @@ const {
   unidadesVendidas,
   ventaMayor,
   ticketPromedio,
-  ventasPorCiudad
+  ventasPorCiudad,
+  totalPorCiudad
 } = require("./analitica");
 
 console.log("\n=== PRUEBAS DE INDICADORES (CICLOS MANUALES) ===");
@@ -55,3 +56,4 @@ console.log("unidadesVendidas([]):", unidadesVendidas(vacio)); // 0
 console.log("ventaMayor([]):", ventaMayor(vacio)); // null
 console.log("ticketPromedio([]):", ticketPromedio(vacio)); // 0 (Sin NaN)
 console.log('ventasPorCiudad([], "Medellín"):', ventasPorCiudad(vacio, "Medellín")); // 0
+console.log('totalPorCiudad([]):', totalPorCiudad(ventas)); // {}
