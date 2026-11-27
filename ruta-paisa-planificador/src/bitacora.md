@@ -679,3 +679,48 @@ Escala: 1 = requiere apoyo, 2 = en progreso, 3 = competente, 4 = destacado. La e
 ### Rotación del trío
 
 Se conserva el formato del MiniReto 9: 20 minutos para resolver y 5 para retroalimentar. Para rotar respecto a la ronda anterior, el orden planeado de candidatos es Integrante 2, Integrante 3 e Integrante 1; sustituir los rótulos por los nombres del equipo y registrar la participación real.
+
+## Plan de mantenimiento: ciclos y orden de ejecución
+
+Cada arista apunta de la tarea requisito hacia la tarea dependiente. El grafo original es:
+
+```mermaid
+flowchart LR
+  T1 --> T2
+  T2 --> T4
+  T3 --> T4
+  T4 --> T5
+  T5 --> T3
+  T4 --> T6
+```
+
+La dependencia forma el ciclo **T3 → T4 → T5 → T3**: la actualización (T3) requiere sensores (T5), instalar sensores (T5) requiere probar la señalización (T4), y probarla (T4) requiere actualizarla (T3). No se puede iniciar ese bloque de tareas.
+
+`GrafoDirigido` mantiene una lista de adyacencia de un solo sentido. `tieneCiclo()` recorre DFS con estados `SIN_VISITAR`, `EN_PROCESO` y `TERMINADA`; una arista hacia una tarea en proceso reconstruye y devuelve el ciclo cerrado, o `null` si no existe ciclo. El diagnóstico normaliza la rotación según el orden de inserción para mostrar el ciclo como arriba. Detección: `O(V + E)` tiempo y `O(V)` espacio.
+
+### Corrección propuesta y orden topológico
+
+Se cambia el requisito de T5: instalar sensores después de cambiar los rieles (T2), en lugar de esperar a la prueba (T4). Los sensores quedan instalados antes de actualizar la señalización, y las pruebas siguen dependiendo de los rieles y del software. Así se elimina la dependencia circular:
+
+```mermaid
+flowchart LR
+  T1 --> T2
+  T2 --> T4
+  T2 --> T5
+  T5 --> T3
+  T3 --> T4
+  T4 --> T6
+```
+
+El orden válido que genera el DFS es **T1 → T2 → T5 → T3 → T4 → T6**:
+
+| Orden | Tarea | Dependencias ya completadas |
+|---:|---|---|
+| 1 | T1: Cerrar el tramo Caribe–Universidad | Ninguna |
+| 2 | T2: Cambiar rieles del tramo | T1 |
+| 3 | T5: Instalar sensores nuevos | T2 |
+| 4 | T3: Actualizar el software de señalización | T5 |
+| 5 | T4: Probar la señalización | T2, T3 |
+| 6 | T6: Reabrir el tramo | T4 |
+
+`ordenDeEjecucion()` usa el orden de finalización del DFS invertido y rechaza el plan si encuentra un ciclo. El ordenamiento topológico también cuesta `O(V + E)` tiempo y `O(V)` espacio. Ejecutar `node src/planificador.js --mantenimiento` muestra el ciclo original, la corrección y el orden propuesto.

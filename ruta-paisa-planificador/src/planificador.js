@@ -155,7 +155,13 @@ function ejecutar(argumentos, imprimir = console.log) {
 }
 
 if (require.main === module) {
-  process.exitCode = ejecutar(process.argv.slice(2));
+  const argumentos = process.argv.slice(2);
+  if (argumentos.length === 1 && argumentos[0] === "--mantenimiento") {
+    const { ejecutarMantenimiento } = require("./retos/mantenimiento");
+    process.exitCode = ejecutarMantenimiento();
+  } else {
+    process.exitCode = ejecutar(argumentos);
+  }
 }
 
 module.exports = { interpretarArgumentos, ejecutar };

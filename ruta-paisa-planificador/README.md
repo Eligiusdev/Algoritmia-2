@@ -9,6 +9,7 @@ Desde la carpeta del proyecto:
 ```bash
 node src/planificador.js 10 59
 node src/planificador.js 29 70 --cerradas 56
+node src/planificador.js --mantenimiento
 node src/retos/demanda.js
 node src/indice.js
 node --test test/*.test.js
@@ -26,6 +27,13 @@ node src/planificador.js <origen> <destino> [--cerradas <código> ...]
 
 Los códigos inexistentes o argumentos inválidos producen un mensaje de error
 descriptivo. Si origen y destino coinciden, informa que no hay paradas.
+
+El modo de mantenimiento comprueba las dependencias de tareas, señala ciclos
+y presenta el orden topológico del plan corregido:
+
+```bash
+node src/planificador.js --mantenimiento
+```
 
 El reporte de `indice.js` muestra búsquedas por código, el mínimo y máximo, el rango de la zona norte y el listado completo de estaciones.
 
