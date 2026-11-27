@@ -2,37 +2,41 @@ const Grafo = require("./Grafo");
 const { codigosEstaciones20 } = require("./ArbolBusqueda");
 
 const lineas = [
-  [
-    10, 20, 30, 35, 40, 45, 50,
-    60, 65, 70, 80, 90
-  ],
-  [50, 52, 54, 56, 58, 59],
-  [30, 25, 27, 29],
-  [40, 56, 65]
+  {
+    nombre: "Línea A",
+    estaciones: [10, 20, 30, 35, 40, 45, 50, 60, 65, 70, 80, 90]
+  },
+  { nombre: "Línea B", estaciones: [50, 52, 54, 56, 58, 59] },
+  { nombre: "Línea K", estaciones: [30, 25, 27, 29] },
+  { nombre: "Línea T", estaciones: [40, 56, 65] }
 ];
 
 const red = new Grafo();
 
-for (const linea of lineas) {
-  for (const codigo of linea) {
+for (const { nombre, estaciones } of lineas) {
+  for (const codigo of estaciones) {
     red.agregarEstacion(codigo);
   }
 
-  for (let i = 0; i < linea.length - 1; i++) {
-    red.conectar(linea[i], linea[i + 1]);
+  for (let i = 0; i < estaciones.length - 1; i++) {
+    red.conectar(estaciones[i], estaciones[i + 1], nombre);
   }
 }
 
 const nombreEstacion = (codigo) =>
   codigosEstaciones20.get(codigo) || `Código ${codigo}`;
 
-console.log("Red Ruta Paisa");
-console.log("Estaciones:", red.contarEstaciones());
-console.log("Conexiones:", red.contarConexiones());
+const reportar = (...valores) => {
+  if (require.main === module) console.log(...valores);
+};
 
-console.log("Estaciones de transbordo:");
+reportar("Red Ruta Paisa");
+reportar("Estaciones:", red.contarEstaciones());
+reportar("Conexiones:", red.contarConexiones());
+
+reportar("Estaciones de transbordo:");
 for (const codigo of red.transbordos()) {
-  console.log(`${nombreEstacion(codigo)} (${codigo}) - grado ${red.grado(codigo)}`);
+  reportar(`${nombreEstacion(codigo)} (${codigo}) - grado ${red.grado(codigo)}`);
 }
 
 const formatearEstaciones = (componente) =>
@@ -46,7 +50,7 @@ const formatearRuta = (camino) =>
 
 const imprimirRuta = (descripcion, camino) => {
   const paradas = camino ? ` (${camino.length - 1} paradas)` : "";
-  console.log(`${descripcion}: ${formatearRuta(camino)}${paradas}`);
+  reportar(`${descripcion}: ${formatearRuta(camino)}${paradas}`);
 };
 
 const traza = [];
@@ -56,8 +60,8 @@ red.dfs(29, new Set(), (_codigo, pila) => {
   }
 });
 
-console.log("\nDFS recursivo desde Santo Domingo:");
-traza.forEach((paso, indice) => console.log(`${indice + 1}. ${paso}`));
+reportar("\nDFS recursivo desde Santo Domingo:");
+traza.forEach((paso, indice) => reportar(`${indice + 1}. ${paso}`));
 
 const alcanzablesRecursivo = red.dfs(29);
 const alcanzablesIterativo = red.dfsIterativo(29);
@@ -74,11 +78,11 @@ const desdeTodasLasEstaciones = [...red.adyacencia.keys()].every(
     red.dfs(inicio).size === red.contarEstaciones() &&
     red.dfsIterativo(inicio).size === red.contarEstaciones()
 );
-console.log(
+reportar(
   `Alcanzables: ${alcanzablesRecursivo.size}/${red.contarEstaciones()}; ` +
   `DFS iterativo coincide: ${mismosAlcanzables}`
 );
-console.log(`Desde todas las estaciones se alcanzan las 20: ${desdeTodasLasEstaciones}`);
+reportar(`Desde todas las estaciones se alcanzan las 20: ${desdeTodasLasEstaciones}`);
 
 const cerradasEstadio = new Set([56]);
 const componentesEstadio = red.componentes(cerradasEstadio);
@@ -89,11 +93,11 @@ const aisladasEstadio = componentesEstadio
   .filter((componente) => componente !== componentePrincipalEstadio)
   .flatMap((componente) => [...componente]);
 
-console.log("\nCierre de Estadio (56):");
+reportar("\nCierre de Estadio (56):");
 componentesEstadio.forEach((componente, indice) => {
-  console.log(`Componente ${indice + 1}: ${formatearEstaciones(componente)}`);
+  reportar(`Componente ${indice + 1}: ${formatearEstaciones(componente)}`);
 });
-console.log(
+reportar(
   "Estaciones aisladas del componente principal:",
   aisladasEstadio.map(nombreEstacion).join(", ")
 );
@@ -106,11 +110,11 @@ for (const codigo of red.adyacencia.keys()) {
   }
 }
 
-console.log("\nEstaciones críticas (componentes al cerrar cada estación):");
+reportar("\nEstaciones críticas (componentes al cerrar cada estación):");
 for (const { codigo, componentes } of estacionesCriticas) {
-  console.log(`${nombreEstacion(codigo)} (${codigo}):`);
+  reportar(`${nombreEstacion(codigo)} (${codigo}):`);
   componentes.forEach((componente, indice) => {
-    console.log(`  ${indice + 1}. ${formatearEstaciones(componente)}`);
+    reportar(`  ${indice + 1}. ${formatearEstaciones(componente)}`);
   });
 }
 
@@ -125,12 +129,12 @@ red.dfs(10, new Set(), (codigo, pila) => {
   if (codigo === 59) caminoDfsNiquiaSanJavier = [...pila];
 });
 
-console.log("\nTraza BFS desde Niquía hasta San Javier:");
+reportar("\nTraza BFS desde Niquía hasta San Javier:");
 for (const { nivel, cola } of trazaBfs) {
-  console.log(`Nivel ${nivel}: [${cola.map(nombreEstacion).join(", ")}]`);
+  reportar(`Nivel ${nivel}: [${cola.map(nombreEstacion).join(", ")}]`);
 }
 
-console.log("\nRutas más cortas (red completa):");
+reportar("\nRutas más cortas (red completa):");
 imprimirRuta("Niquía -> San Javier", rutaNiquiaSanJavier);
 imprimirRuta("Santo Domingo -> Poblado", rutaSantoDomingoPoblado);
 imprimirRuta("La Estrella -> Floresta", rutaEstrellaFloresta);
@@ -138,7 +142,7 @@ imprimirRuta("DFS Niquía -> San Javier", caminoDfsNiquiaSanJavier);
 
 const rutaSantoDomingoPobladoCerrada = red.rutaMasCorta(29, 70, cerradasEstadio);
 const rutaNiquiaSanJavierCerrada = red.rutaMasCorta(10, 59, cerradasEstadio);
-console.log("\nRutas con Estadio cerrado:");
+reportar("\nRutas con Estadio cerrado:");
 imprimirRuta("Santo Domingo -> Poblado", rutaSantoDomingoPobladoCerrada);
 imprimirRuta("Niquía -> San Javier", rutaNiquiaSanJavierCerrada);
 

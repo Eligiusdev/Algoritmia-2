@@ -1,4 +1,4 @@
-# Planificador Ruta Paisa
+# Planificador Ruta Paisa v0.2
 
 Planificador y índice de las estaciones de Ruta Paisa construido con estructuras de datos en JavaScript.
 
@@ -7,10 +7,26 @@ Planificador y índice de las estaciones de Ruta Paisa construido con estructura
 Desde la carpeta del proyecto:
 
 ```bash
+node src/planificador.js 10 59
+node src/planificador.js 29 70 --cerradas 56
 node src/indice.js
+node --test test/planificador.test.js
 ```
 
-El reporte muestra búsquedas por código, el mínimo y máximo, el rango de la zona norte y el listado completo de estaciones.
+El planificador v0.2 recibe el código de origen y destino, valida ambos en el
+árbol binario de búsqueda y calcula la ruta con menos paradas usando BFS.
+Presenta los nombres de estaciones, la línea de cada tramo y los transbordos.
+`--cerradas` acepta uno o más códigos separados por espacios; si no existe una
+ruta con esos cierres, muestra un aviso claro.
+
+```text
+node src/planificador.js <origen> <destino> [--cerradas <código> ...]
+```
+
+Los códigos inexistentes o argumentos inválidos producen un mensaje de error
+descriptivo. Si origen y destino coinciden, informa que no hay paradas.
+
+El reporte de `indice.js` muestra búsquedas por código, el mínimo y máximo, el rango de la zona norte y el listado completo de estaciones.
 
 También pueden ejecutarse individualmente:
 

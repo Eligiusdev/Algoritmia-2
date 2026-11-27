@@ -520,3 +520,21 @@ La ruta Niquía → San Javier usa la conexión Hospital–Estadio de la línea 
 
 - Si origen y destino son la misma estación abierta, devuelve `[origen]` (cero paradas).
 - Si el origen o destino no existe, si alguno está cerrado o si no hay conexión posible, devuelve `null` sin lanzar un error.
+
+## Planificador de viajes v0.2
+
+`src/planificador.js` integra el índice `arbol20` con el grafo: recibe códigos por `process.argv`, valida origen, destino y cierres con `buscar`, calcula la ruta BFS, y presenta nombres, línea de cada tramo, paradas y transbordos. Las aristas guardan la línea mediante `conectar(origen, destino, linea)`; las etiquetas se consultan en ambos sentidos. La opción `--cerradas` acepta uno o más códigos, por ejemplo `node src/planificador.js 29 70 --cerradas 56`. Si el cierre permite rodear, se presenta la ruta alternativa; si desconecta el destino, se informa que el viaje es imposible.
+
+Ejemplo `node src/planificador.js 10 59`: la ruta tiene 7 paradas y cambia de Línea A a Línea T en Hospital, y de Línea T a Línea B en Estadio. Si Estadio (56) está cerrado, Niquía → San Javier es imposible; Santo Domingo → Poblado cambia de 8 a 10 paradas y se desvía por Hospital, Parque Berrío, San Antonio y Exposiciones.
+
+### Estructuras de datos del planificador
+
+| Estructura | Uso | Operación principal y complejidad |
+|---|---|---|
+| Árbol general | Representar jerárquicamente la red (modos, líneas, estaciones y servicios); es un modelo de organización, no el índice consultado por el planificador. | Buscar un elemento recorriendo el árbol: `O(V)`. |
+| Árbol binario de búsqueda | Indexar códigos y validar origen, destino y estaciones cerradas mediante `arbol20.buscar`. | Buscar: `O(h)`; `O(log V)` si está balanceado y `O(V)` en el peor caso. |
+| Grafo | Representar estaciones, conexiones no dirigidas y la línea asociada a cada conexión. | Recorrer vecinos cuesta `O(grado(v))`; BFS completo cuesta `O(V + E)`. |
+| Cola | Mantener estaciones pendientes en orden FIFO durante BFS; se implementa con arreglo e índice de cabeza. | Encolar y desencolar: `O(1)` por operación; BFS completo: `O(V + E)`. |
+| Pila | Guardar estaciones pendientes en DFS iterativo; DFS recursivo utiliza la pila de llamadas. | Apilar/desapilar: `O(1)`; DFS completo: `O(V + E)`. |
+| Set | Controlar estaciones visitadas y cerradas sin duplicados. | Consultar/agregar: `O(1)` promedio; forma parte de recorridos `O(V + E)`. |
+| Map | Guardar padres en BFS para reconstruir la ruta y etiquetas de línea para cada arista. | Consultar/insertar: `O(1)` promedio; reconstruir la ruta cuesta `O(V)` como máximo. |

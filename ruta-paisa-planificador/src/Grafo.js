@@ -1,27 +1,42 @@
 class Grafo {
   constructor() {
     this.adyacencia = new Map();
+    this.lineasPorConexion = new Map();
   }
 
   agregarEstacion(codigo) {
     if (!this.adyacencia.has(codigo)) {
       this.adyacencia.set(codigo, new Set());
+      this.lineasPorConexion.set(codigo, new Map());
     }
   }
 
-  conectar(a, b) {
+  conectar(a, b, linea = null) {
     this.agregarEstacion(a);
     this.agregarEstacion(b);
 
     if (a !== b) {
       this.adyacencia.get(a).add(b);
       this.adyacencia.get(b).add(a);
+
+      if (linea !== null) {
+        const lineasDesdeA = this.lineasPorConexion.get(a);
+        const lineasDesdeB = this.lineasPorConexion.get(b);
+        if (!lineasDesdeA.has(b)) lineasDesdeA.set(b, new Set());
+        if (!lineasDesdeB.has(a)) lineasDesdeB.set(a, new Set());
+        lineasDesdeA.get(b).add(linea);
+        lineasDesdeB.get(a).add(linea);
+      }
     }
   }
 
   vecinos(codigo) {
     if (!this.adyacencia.has(codigo)) return [];
     return [...this.adyacencia.get(codigo)];
+  }
+
+  lineasDeConexion(a, b) {
+    return [...(this.lineasPorConexion.get(a)?.get(b) || [])];
   }
 
   dfs(inicio, cerradas = new Set(), alVisitar = null) {
