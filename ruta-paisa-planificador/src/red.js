@@ -41,6 +41,14 @@ const formatearEstaciones = (componente) =>
     .map((codigo) => `${nombreEstacion(codigo)} (${codigo})`)
     .join(", ");
 
+const formatearRuta = (camino) =>
+  camino ? camino.map(nombreEstacion).join(" -> ") : "Inalcanzable";
+
+const imprimirRuta = (descripcion, camino) => {
+  const paradas = camino ? ` (${camino.length - 1} paradas)` : "";
+  console.log(`${descripcion}: ${formatearRuta(camino)}${paradas}`);
+};
+
 const traza = [];
 red.dfs(29, new Set(), (_codigo, pila) => {
   if (traza.length < 6) {
@@ -106,6 +114,34 @@ for (const { codigo, componentes } of estacionesCriticas) {
   });
 }
 
+const trazaBfs = [];
+const rutaNiquiaSanJavier = red.rutaMasCorta(10, 59, new Set(), (nivel, cola) => {
+  trazaBfs.push({ nivel, cola: [...cola] });
+});
+const rutaSantoDomingoPoblado = red.rutaMasCorta(29, 70);
+const rutaEstrellaFloresta = red.rutaMasCorta(90, 58);
+let caminoDfsNiquiaSanJavier = null;
+red.dfs(10, new Set(), (codigo, pila) => {
+  if (codigo === 59) caminoDfsNiquiaSanJavier = [...pila];
+});
+
+console.log("\nTraza BFS desde Niquía hasta San Javier:");
+for (const { nivel, cola } of trazaBfs) {
+  console.log(`Nivel ${nivel}: [${cola.map(nombreEstacion).join(", ")}]`);
+}
+
+console.log("\nRutas más cortas (red completa):");
+imprimirRuta("Niquía -> San Javier", rutaNiquiaSanJavier);
+imprimirRuta("Santo Domingo -> Poblado", rutaSantoDomingoPoblado);
+imprimirRuta("La Estrella -> Floresta", rutaEstrellaFloresta);
+imprimirRuta("DFS Niquía -> San Javier", caminoDfsNiquiaSanJavier);
+
+const rutaSantoDomingoPobladoCerrada = red.rutaMasCorta(29, 70, cerradasEstadio);
+const rutaNiquiaSanJavierCerrada = red.rutaMasCorta(10, 59, cerradasEstadio);
+console.log("\nRutas con Estadio cerrado:");
+imprimirRuta("Santo Domingo -> Poblado", rutaSantoDomingoPobladoCerrada);
+imprimirRuta("Niquía -> San Javier", rutaNiquiaSanJavierCerrada);
+
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     red,
@@ -116,6 +152,14 @@ if (typeof module !== "undefined" && module.exports) {
     aisladasEstadio,
     componentesEstadio,
     mismosAlcanzables,
-    desdeTodasLasEstaciones
+    desdeTodasLasEstaciones,
+    formatearRuta,
+    trazaBfs,
+    rutaNiquiaSanJavier,
+    rutaSantoDomingoPoblado,
+    rutaEstrellaFloresta,
+    caminoDfsNiquiaSanJavier,
+    rutaSantoDomingoPobladoCerrada,
+    rutaNiquiaSanJavierCerrada
   };
 }

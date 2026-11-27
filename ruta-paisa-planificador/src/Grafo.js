@@ -83,6 +83,54 @@ class Grafo {
     return componentes;
   }
 
+  rutaMasCorta(origen, destino, cerradas = new Set(), alProcesarNivel = null) {
+    if (
+      !this.adyacencia.has(origen) ||
+      !this.adyacencia.has(destino) ||
+      cerradas.has(origen) ||
+      cerradas.has(destino)
+    ) {
+      return null;
+    }
+
+    const visitadas = new Set([origen]);
+    const padres = new Map([[origen, null]]);
+    const cola = [origen];
+    let inicioNivel = 0;
+    let nivel = 0;
+
+    while (inicioNivel < cola.length) {
+      const finNivel = cola.length;
+      if (alProcesarNivel) {
+        alProcesarNivel(nivel, cola.slice(inicioNivel, finNivel));
+      }
+
+      while (inicioNivel < finNivel) {
+        const actual = cola[inicioNivel++];
+        if (actual === destino) {
+          const camino = [];
+          let estacion = destino;
+          while (estacion !== null) {
+            camino.push(estacion);
+            estacion = padres.get(estacion);
+          }
+          return camino.reverse();
+        }
+
+        for (const vecino of this.vecinos(actual)) {
+          if (cerradas.has(vecino) || visitadas.has(vecino)) continue;
+          visitadas.add(vecino);
+          padres.set(vecino, actual);
+          cola.push(vecino);
+        }
+      }
+
+      nivel++;
+    }
+
+    return null;
+  }
+
   grado(codigo) {
     if (!this.adyacencia.has(codigo)) return 0;
     return this.adyacencia.get(codigo).size;

@@ -42,9 +42,13 @@ conectadas y el análisis de estaciones críticas. En `Grafo`:
 - `dfs(inicio, cerradas)`: conjunto alcanzable con DFS recursivo.
 - `dfsIterativo(inicio, cerradas)`: mismo recorrido usando una pila explícita.
 - `componentes(cerradas)`: grupos conectados, omitiendo estaciones cerradas.
+- `rutaMasCorta(origen, destino, cerradas)`: camino más corto en número de
+  conexiones, calculado con BFS y reconstruido mediante el mapa de padres.
 
 Los cierres se pasan como `Set` de códigos. Cada recorrido y la obtención de
-componentes tienen complejidad `O(V + E)`.
+componentes tienen complejidad `O(V + E)`. `rutaMasCorta` devuelve `[origen]`
+si origen y destino coinciden, y `null` si una estación no existe, está cerrada
+o no hay camino.
 
 ## Grafo de conexiones
 

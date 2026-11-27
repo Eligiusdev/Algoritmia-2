@@ -481,3 +481,42 @@ Una estación es crítica si al cerrarla quedan dos o más componentes. Cada gru
 | Andalucía (27) | `{10, 20, 25, 30, 35, 40, 45, 50, 52, 54, 56, 58, 59, 60, 65, 70, 80, 90}`; `{29}` |
 
 El barrido prueba el cierre individual de cada vértice, calculando componentes en cada prueba; por eso el análisis completo de criticidad con este método directo cuesta `O(V(V + E))`. La complejidad `O(V + E)` corresponde a cada DFS y a cada cálculo individual de componentes.
+
+## BFS para la ruta con menos paradas
+
+Se implementó `rutaMasCorta(origen, destino, cerradas)` con BFS. La cola es un arreglo con índice de cabeza (sin `shift`, para mantener costo constante por extracción), `visitadas` evita encolar estaciones repetidas y `padres` registra el vértice desde el que se descubrió cada estación. Al llegar al destino, se sigue el mapa de padres hacia atrás y se invierte la secuencia para devolver el camino origen-destino. En esta red no ponderada, BFS garantiza la menor cantidad de conexiones en `O(V + E)`; reconstruir la ruta cuesta `O(V)` en el peor caso.
+
+### Traza BFS desde Niquía hasta San Javier
+
+Cada fila muestra la cola correspondiente a un nivel de distancia desde Niquía. En el último nivel, San Javier es el tercer elemento y el recorrido se detiene cuando sale de la cola:
+
+| Nivel | Cola |
+|---:|---|
+| 0 | Niquía |
+| 1 | Bello |
+| 2 | Caribe |
+| 3 | Universidad, Acevedo |
+| 4 | Hospital, Andalucía |
+| 5 | Parque Berrío, Estadio, Santo Domingo |
+| 6 | San Antonio, Suramericana, Floresta, Industriales |
+| 7 | Exposiciones, Cisneros, San Javier, Poblado |
+
+### Rutas calculadas
+
+| Origen → destino | Camino mínimo | Paradas |
+|---|---|---:|
+| Niquía → San Javier | Niquía → Bello → Caribe → Universidad → Hospital → Estadio → Floresta → San Javier | 7 |
+| Santo Domingo → Poblado | Santo Domingo → Andalucía → Acevedo → Caribe → Universidad → Hospital → Estadio → Industriales → Poblado | 8 |
+| La Estrella → Floresta | La Estrella → Itagüí → Poblado → Industriales → Estadio → Floresta | 5 |
+
+La ruta Niquía → San Javier usa la conexión Hospital–Estadio de la línea T. DFS, por el orden de vecinos de la red, primero se interna por Parque Berrío, San Antonio y Exposiciones antes de regresar a Estadio; encuentra un camino válido de 11 paradas. BFS compara por niveles y devuelve el camino de 7 paradas, sin confundir “primer camino encontrado en profundidad” con “camino más corto”.
+
+### Efecto del cierre de Estadio
+
+- **Santo Domingo → Poblado:** pasa de 8 a 10 paradas. Sin el atajo por Estadio–Industriales, la ruta rodea por Hospital → Parque Berrío → San Antonio → Exposiciones → Industriales y continúa a Poblado.
+- **Niquía → San Javier:** queda inalcanzable. Estadio es el único acceso a la subred Floresta–San Javier, que queda desconectada cuando se cierra.
+
+### Casos borde
+
+- Si origen y destino son la misma estación abierta, devuelve `[origen]` (cero paradas).
+- Si el origen o destino no existe, si alguno está cerrado o si no hay conexión posible, devuelve `null` sin lanzar un error.
