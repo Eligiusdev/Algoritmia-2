@@ -724,3 +724,26 @@ El orden válido que genera el DFS es **T1 → T2 → T5 → T3 → T4 → T6**:
 | 6 | T6: Reabrir el tramo | T4 |
 
 `ordenDeEjecucion()` usa el orden de finalización del DFS invertido y rechaza el plan si encuentra un ciclo. El ordenamiento topológico también cuesta `O(V + E)` tiempo y `O(V)` espacio. Ejecutar `node src/planificador.js --mantenimiento` muestra el ciclo original, la corrección y el orden propuesto.
+
+## Cierre de semana: Ruta Paisa v1.0
+
+| MiniReto | Qué se construyó | Aporte al producto |
+|---:|---|---|
+| 1. Estación base | Árbol general y recursión | Jerarquía de modos, líneas, estaciones y servicios; mostró el límite de modelar conexiones compartidas con árbol. |
+| 2. Índice de estaciones | Árbol binario de búsqueda | Validación y búsqueda de estaciones por código. |
+| 3. Recorridos del índice | Inorden, preorden, postorden y altura | Listados ordenados, exportación y análisis de la forma del índice. |
+| 4. Ruta Paisa v0.1 | Mínimo, máximo, rangos y árbol degenerado | Consultas de índice y justificación del costo según altura. |
+| 5. La red como grafo | Lista de adyacencia y transbordos | Modelo de conexiones no dirigidas y estaciones compartidas. |
+| 6. DFS y cierres | Alcanzabilidad, componentes y estaciones críticas | Análisis de desconexión al cerrar estaciones. |
+| 7. Menos paradas | BFS y reconstrucción con padres | Ruta mínima en número de conexiones. |
+| 8. Ruta Paisa v0.2 | Integración del índice y el grafo | CLI de viajes con nombres, líneas, transbordos y cierres. |
+| 9. Simulacro I | Claves compuestas y `Set` | Detección de validaciones duplicadas y monto a corregir. |
+| 10. Simulacro II | Ventana deslizante y frecuencias con `Map` | Hora pico y ranking de estaciones usadas. |
+| 11. Mantenimiento sin ciclos | Grafo dirigido, DFS con estados y orden topológico | Diagnóstico de dependencias circulares y calendario válido de obras. |
+| 12. Ruta Paisa v1.0 | Organización modular, CLI integral, pruebas y documentación | Producto final que reúne las consultas y decisiones técnicas de la semana. |
+
+### Reflexión final
+
+La estrategia más útil fue elegir la estructura después de precisar la operación que el usuario necesita: BST para buscar códigos y recorrer rangos; lista de adyacencia más BFS para rutas mínimas; `Set` para detectar repeticiones; ventana deslizante para conteos consecutivos; y DFS con estados para ciclos. Explicar primero la entrada, los casos borde y la complejidad ayudó a evitar usar una estructura conocida para un problema que no resuelve.
+
+La sustentación de cinco minutos está preparada en el README con dos demostraciones, una decisión justificada y una mejora futura. No se realizó una presentación presencial en esta sesión; por tanto, la rúbrica y la recepción de comentarios siguen pendientes y deben completarse con el grupo. El historial previo se preserva: no se reescribieron commits antiguos para fabricar una secuencia histórica por MiniReto.

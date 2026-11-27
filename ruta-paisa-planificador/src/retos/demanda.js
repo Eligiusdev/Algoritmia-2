@@ -1,4 +1,4 @@
-const { codigosEstaciones20 } = require("../ArbolBusqueda");
+const { codigosEstaciones20 } = require("../estructuras/ArbolBusqueda");
 
 const porMinutoEjemplo = [
   120, 135, 150, 180, 210, 260, 310, 340, 330, 300,

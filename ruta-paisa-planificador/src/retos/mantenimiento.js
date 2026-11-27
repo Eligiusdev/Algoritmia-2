@@ -1,4 +1,4 @@
-const GrafoDirigido = require("../GrafoDirigido");
+const GrafoDirigido = require("../estructuras/GrafoDirigido");
 
 const tareasOriginales = [
   { codigo: "T1", descripcion: "Cerrar el tramo Caribe–Universidad", requiere: [] },

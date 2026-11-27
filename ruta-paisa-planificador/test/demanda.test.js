@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { codigosEstaciones20 } = require("../src/ArbolBusqueda");
+const { codigosEstaciones20 } = require("../src/estructuras/ArbolBusqueda");
 const {
   estacionesMasUsadas,
   generarValidacionesAleatorias,

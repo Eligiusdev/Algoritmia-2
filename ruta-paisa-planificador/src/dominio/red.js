@@ -1,5 +1,5 @@
-const Grafo = require("./Grafo");
-const { codigosEstaciones20 } = require("./ArbolBusqueda");
+const Grafo = require("../estructuras/Grafo");
+const { codigosEstaciones20 } = require("../estructuras/ArbolBusqueda");
 
 const lineas = [
   {
@@ -102,13 +102,7 @@ reportar(
   aisladasEstadio.map(nombreEstacion).join(", ")
 );
 
-const estacionesCriticas = [];
-for (const codigo of red.adyacencia.keys()) {
-  const componentes = red.componentes(new Set([codigo]));
-  if (componentes.length >= 2) {
-    estacionesCriticas.push({ codigo, componentes });
-  }
-}
+const estacionesCriticas = red.estacionesCriticas();
 
 reportar("\nEstaciones críticas (componentes al cerrar cada estación):");
 for (const { codigo, componentes } of estacionesCriticas) {

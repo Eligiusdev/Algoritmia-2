@@ -1,3 +1,5 @@
+const Cola = require("./Cola");
+
 class Grafo {
   constructor() {
     this.adyacencia = new Map();
@@ -98,6 +100,17 @@ class Grafo {
     return componentes;
   }
 
+  estacionesCriticas() {
+    const criticas = [];
+    for (const codigo of this.adyacencia.keys()) {
+      const componentes = this.componentes(new Set([codigo]));
+      if (componentes.length >= 2) {
+        criticas.push({ codigo, componentes });
+      }
+    }
+    return criticas;
+  }
+
   rutaMasCorta(origen, destino, cerradas = new Set(), alProcesarNivel = null) {
     if (
       !this.adyacencia.has(origen) ||
@@ -110,18 +123,18 @@ class Grafo {
 
     const visitadas = new Set([origen]);
     const padres = new Map([[origen, null]]);
-    const cola = [origen];
-    let inicioNivel = 0;
+    const cola = new Cola();
+    cola.encolar(origen);
     let nivel = 0;
 
-    while (inicioNivel < cola.length) {
-      const finNivel = cola.length;
+    while (!cola.estaVacia()) {
+      const estacionesEnNivel = cola.tamanio();
       if (alProcesarNivel) {
-        alProcesarNivel(nivel, cola.slice(inicioNivel, finNivel));
+        alProcesarNivel(nivel, cola.contenido());
       }
 
-      while (inicioNivel < finNivel) {
-        const actual = cola[inicioNivel++];
+      for (let indice = 0; indice < estacionesEnNivel; indice++) {
+        const actual = cola.desencolar();
         if (actual === destino) {
           const camino = [];
           let estacion = destino;
@@ -136,7 +149,7 @@ class Grafo {
           if (cerradas.has(vecino) || visitadas.has(vecino)) continue;
           visitadas.add(vecino);
           padres.set(vecino, actual);
-          cola.push(vecino);
+          cola.encolar(vecino);
         }
       }
 

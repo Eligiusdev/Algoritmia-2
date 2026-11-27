@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const { spawnSync } = require("node:child_process");
 const path = require("node:path");
 const test = require("node:test");
-const GrafoDirigido = require("../src/GrafoDirigido");
+const GrafoDirigido = require("../src/estructuras/GrafoDirigido");
 const {
   construirGrafo,
   tareasCorregidas,

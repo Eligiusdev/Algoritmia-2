@@ -2,7 +2,7 @@ const {
   ArbolBusqueda,
   codigosEstaciones,
   codigosEstaciones20
-} = require("./ArbolBusqueda");
+} = require("../estructuras/ArbolBusqueda");
 
 const indice = new ArbolBusqueda();
 for (const [codigo, estacion] of codigosEstaciones) {
