@@ -10,7 +10,7 @@ Desde la carpeta del proyecto:
 node src/planificador.js 10 59
 node src/planificador.js 29 70 --cerradas 56
 node src/indice.js
-node --test test/planificador.test.js
+node --test test/*.test.js
 ```
 
 El planificador v0.2 recibe el código de origen y destino, valida ambos en el

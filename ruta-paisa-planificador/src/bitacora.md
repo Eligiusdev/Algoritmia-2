@@ -538,3 +538,71 @@ Ejemplo `node src/planificador.js 10 59`: la ruta tiene 7 paradas y cambia de L�
 | Pila | Guardar estaciones pendientes en DFS iterativo; DFS recursivo utiliza la pila de llamadas. | Apilar/desapilar: `O(1)`; DFS completo: `O(V + E)`. |
 | Set | Controlar estaciones visitadas y cerradas sin duplicados. | Consultar/agregar: `O(1)` promedio; forma parte de recorridos `O(V + E)`. |
 | Map | Guardar padres en BFS para reconstruir la ruta y etiquetas de línea para cada arista. | Consultar/insertar: `O(1)` promedio; reconstruir la ruta cuesta `O(V)` como máximo. |
+
+## Reto de entrevista: validaciones duplicadas
+
+### Protocolo en voz alta: respuesta del candidato
+
+**Reformulación.** “Recibo validaciones de torniquete y debo detectar cada aparición repetida de una misma tarjeta en la misma estación y en el mismo minuto. La primera validación se conserva y cada repetición posterior se devuelve para corregir su cobro; el total a corregir es la suma del valor de esas repeticiones.”
+
+**Preguntas para el entrevistador.**
+
+- ¿Cuántas validaciones puede haber en un día? No se especifica un límite; asumiré `n` registros y una solución que escale linealmente.
+- ¿`hora` ya viene normalizada al minuto? Sí: el dato se entrega como `HH:mm`; segundos no forman parte del criterio.
+- Si hay tres registros con la misma clave, ¿se corrigen los dos posteriores? Asumiré que sí: se conserva el primero y cada aparición subsiguiente es un cobro duplicado.
+- ¿El valor es numérico y cada validación repetida debe sumar su propio valor? Asumiré valores numéricos en pesos colombianos, como los `$3.000` del ejemplo.
+
+**Casos de prueba y bordes que propongo.**
+
+| Caso | Resultado esperado |
+|---|---|
+| Una validación y su repetición exacta | La segunda es duplicada. |
+| Misma tarjeta/estación, minutos `07:02` y `07:09` | No son duplicadas: cambia la clave temporal. |
+| Misma tarjeta y minuto, estaciones distintas | No son duplicadas. |
+| Lista vacía o con un solo elemento | Ningún duplicado; monto `$0`. |
+| Tres registros con la misma clave | Se devuelven el segundo y el tercero; el primero se conserva. |
+
+**Solución inicial por fuerza bruta.** Para cada registro, compararía tarjeta, estación y minuto con todos los registros anteriores. Si alguno coincide, agregaría el actual una sola vez al resultado y sumaría su valor. El tiempo es `O(n²)` por comparar pares; el espacio adicional es `O(d)` para los `d` duplicados que se devuelven.
+
+**Optimización.** Construyo la clave compuesta con una plantilla de texto `` `${tarjeta}|${estacion}|${hora}` `` y la guardo en un `Set`. Si ya existe, el registro actual es duplicado; si no, guardo la clave. Así cada registro se procesa una vez: tiempo esperado `O(n)` y espacio auxiliar `O(u)`, donde `u` es el número de claves únicas. El arreglo de resultados ocupa además `O(d)`, donde `d` es la cantidad de duplicados. `montoACorregir` suma el `valor` de los registros devueltos; ese segundo recorrido también es lineal, por lo que el tiempo total se mantiene en `O(n)`. Se devuelve cada objeto duplicado posterior, no el primer registro de la pareja.
+
+### Recorrido del ejemplo en voz alta
+
+| # | Clave consultada | Resultado |
+|---:|---|---|
+| 1 | `T-101|50|07:02` | Nueva; se agrega al `Set`. |
+| 2 | `T-205|30|07:02` | Nueva; se agrega al `Set`. |
+| 3 | `T-101|50|07:02` | Ya existe; duplicada, sumar `$3.000`. |
+| 4 | `T-330|56|07:05` | Nueva; se agrega al `Set`. |
+| 5 | `T-205|30|07:09` | Nueva; la hora cambió, no es duplicada. |
+| 6 | `T-412|10|07:10` | Nueva; se agrega al `Set`. |
+| 7 | `T-330|56|07:05` | Ya existe; duplicada, sumar `$3.000`. |
+| 8 | `T-101|60|07:31` | Nueva; estación y hora distintas. |
+
+El resultado son los registros 3 y 7; `montoACorregir` devuelve **$6.000**. El chequeo final cuesta `O(n)` tiempo esperado y `O(u + d)` espacio total, o `O(u)` auxiliar sin contar el arreglo de resultados.
+
+### Rúbrica del simulacro
+
+Escala acordada para esta práctica: 1 = requiere apoyo, 2 = en progreso, 3 = competente, 4 = destacado. Como esta entrega no incluye una entrevista presencial ni comentarios reales de otra persona, la evaluación recibida siguiente es una **simulación de retroalimentación**, no una calificación atribuida a un observador real. Debe confirmarse o reemplazarse después de ejecutar la ronda del trío.
+
+| Criterio | Puntaje simulado | Evidencia / comentario del observador |
+|---|---:|---|
+| Comprensión | 4/4 | Delimita duplicidad por tarjeta, estación y minuto; distingue la primera validación de las repeticiones posteriores. |
+| Diseño | 4/4 | Propone una clave compuesta y un `Set`, y separa detección de cálculo del monto. |
+| Corrección | 4/4 | Identifica las filas 3 y 7, no confunde T-205 a las 07:02 y 07:09, y suma el valor de cada aparición posterior. |
+| Complejidad | 4/4 | Compara fuerza bruta `O(n²)` con el método esperado `O(n)` y distingue el espacio auxiliar `O(u)` del resultado `O(d)`. |
+| Comunicación | 3/4 | Explica el recorrido paso a paso. Oportunidad: confirmar desde el inicio la política para tres o más apariciones y la unidad temporal. |
+
+**Fortaleza recibida (simulada):** la clave representa exactamente las tres dimensiones de identidad y evita contar dos veces el primer cobro. **Oportunidad recibida (simulada):** verbalizar explícitamente qué registro se conserva cuando hay más de dos coincidencias.
+
+**Autoevaluación del candidato:** comprensión 4/4, diseño 4/4, corrección 4/4, complejidad 4/4 y comunicación 3/4. Fortaleza: mantuve el criterio de duplicidad separado del valor monetario y recorrí los ocho registros sin confundir estaciones ni minutos. Mejora: presentar primero la hipótesis de que se conserva la primera aparición y validar la precisión de `hora` antes de codificar.
+
+### Rotación del trío
+
+Cada ronda contempla 20 minutos de resolución y 5 minutos de retroalimentación. La siguiente rotación garantiza un turno de candidato por integrante; los rótulos son marcadores y deben sustituirse por los nombres del trío. La ejecución real no se puede verificar desde este repositorio.
+
+| Ronda | Entrevistador | Candidato | Observador |
+|---:|---|---|---|
+| 1 | Integrante 2 | Integrante 1 | Integrante 3 |
+| 2 | Integrante 3 | Integrante 2 | Integrante 1 |
+| 3 | Integrante 1 | Integrante 3 | Integrante 2 |
